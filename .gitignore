@@ -1,0 +1,17 @@
+# Python
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.pyc
+backend/copytrader.db
+backend/.env
+
+# Node
+frontend/node_modules/
+frontend/dist/
+mobile/node_modules/
+
+# OS
+.DS_Store
+*.log
+/tmp/
