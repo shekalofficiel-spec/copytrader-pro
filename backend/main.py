@@ -12,6 +12,7 @@ from database import init_db, AsyncSessionLocal
 from api import accounts_router, trades_router, dashboard_router, settings_router
 from api.auth import router as auth_router
 from api.billing import router as billing_router
+from api.demo import router as demo_router
 from core.copy_engine import copy_engine
 from websocket.manager import ws_manager
 
@@ -62,6 +63,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.include_router(auth_router)
 app.include_router(billing_router)
+app.include_router(demo_router)
 app.include_router(accounts_router)
 app.include_router(trades_router)
 app.include_router(dashboard_router)
