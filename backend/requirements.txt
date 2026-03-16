@@ -1,0 +1,47 @@
+# FastAPI & ASGI
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# Database
+sqlalchemy[asyncio]==2.0.30
+asyncpg==0.29.0
+alembic==1.13.1
+greenlet==3.0.3
+
+# Redis & Celery
+redis==5.0.4
+celery==5.4.0
+aioredis==2.0.1
+
+# Pydantic v2
+pydantic==2.7.1
+pydantic-settings==2.2.1
+
+# Security & Encryption
+cryptography==42.0.7
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Trading Connectors
+MetaTrader5==5.0.45; sys_platform == "win32"
+python-binance==1.0.19
+binance-futures-connector==3.4.0
+ctrader-open-api==2.0.7
+
+# Notifications
+python-telegram-bot==21.1.1
+aiosmtplib==3.0.1
+jinja2==3.1.4
+
+# HTTP Client
+httpx==0.27.0
+aiohttp==3.9.5
+
+# Utils
+python-dotenv==1.0.1
+structlog==24.1.0
+tenacity==8.3.0
+ujson==5.10.0
+websockets==12.0
+pytz==2024.1

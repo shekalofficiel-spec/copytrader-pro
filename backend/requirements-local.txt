@@ -1,0 +1,26 @@
+# Minimal requirements for local development (no PostgreSQL/Redis needed)
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+sqlalchemy[asyncio]==2.0.30
+aiosqlite==0.20.0
+alembic==1.13.1
+greenlet==3.0.3
+pydantic==2.7.1
+pydantic-settings==2.2.1
+cryptography==42.0.7
+httpx==0.27.0
+jinja2==3.1.4
+structlog==24.1.0
+tenacity==8.3.0
+python-dotenv==1.0.1
+pytz==2024.1
+websockets==12.0
+aiohttp==3.9.5
+celery==5.4.0
+redis==5.0.4
+python-jose[cryptography]==3.5.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.2.1
+stripe==14.4.1
+email-validator==2.3.0
