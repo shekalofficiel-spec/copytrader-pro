@@ -1,0 +1,5 @@
+[phases.install]
+cmds = ["pip install -r requirements-local.txt && pip install python-jose[cryptography] passlib[bcrypt] bcrypt==4.2.1 stripe email-validator"]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port $PORT"
