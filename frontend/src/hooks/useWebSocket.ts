@@ -14,8 +14,14 @@ export function useWebSocket({ maxEvents = 100, onEvent }: UseWebSocketOptions =
   const reconnectDelay = useRef(1000)
 
   const connect = useCallback(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const url = `${protocol}//${window.location.host}/ws/live`
+    const apiUrl = import.meta.env.VITE_API_URL
+    let url: string
+    if (apiUrl) {
+      url = apiUrl.replace(/^https?/, apiUrl.startsWith('https') ? 'wss' : 'ws') + '/ws/live'
+    } else {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      url = `${protocol}//${window.location.host}/ws/live`
+    }
 
     const ws = new WebSocket(url)
     wsRef.current = ws
