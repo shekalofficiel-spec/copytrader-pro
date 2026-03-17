@@ -117,6 +117,15 @@ function AccountCard({ account, onTest, onToggle, onDelete }: {
                     PROP
                   </span>
                 )}
+                {account.is_verified ? (
+                  <span className="text-xs px-2 py-0.5 rounded border bg-[#4ade80]/10 text-[#4ade80] border-[#4ade80]/30">
+                    ✓ Vérifié
+                  </span>
+                ) : (
+                  <span className="text-xs px-2 py-0.5 rounded border bg-yellow-500/10 text-yellow-400 border-yellow-500/30">
+                    Non vérifié
+                  </span>
+                )}
                 {account.is_copy_paused && (
                   <span className="text-xs px-2 py-0.5 rounded border bg-yellow-500/10 text-yellow-400 border-yellow-500/30">
                     PAUSED

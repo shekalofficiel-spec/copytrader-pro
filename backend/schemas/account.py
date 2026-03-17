@@ -99,6 +99,7 @@ class AccountResponse(BaseModel):
     no_trade_weekend: bool
     no_trade_news: bool
     allowed_instruments: list[str]
+    is_verified: bool = False
     current_drawdown: float
     is_copy_paused: bool
     created_at: datetime

@@ -38,6 +38,7 @@ export interface Account {
   margin_level?: number
   open_trades_count: number
   is_connected: boolean
+  is_verified: boolean
   total_profit: number
 }
 

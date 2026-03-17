@@ -59,6 +59,7 @@ async def init_db():
                 "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS profit_target_pct FLOAT",
                 "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS daily_drawdown_pct FLOAT",
                 "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS total_drawdown_pct FLOAT",
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT FALSE",
             ]
             for sql in migrations:
                 try:

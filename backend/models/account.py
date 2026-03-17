@@ -62,6 +62,9 @@ class Account(Base):
     # Filtering
     allowed_instruments: Mapped[list] = mapped_column(JSON, default=list)  # [] = all allowed
 
+    # Verification state
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=False)  # True = credentials confirmed
+
     # Runtime state (not persisted to DB strictly — but cached here)
     current_drawdown: Mapped[float] = mapped_column(Float, default=0.0)
     is_copy_paused: Mapped[bool] = mapped_column(Boolean, default=False)  # auto-paused by risk

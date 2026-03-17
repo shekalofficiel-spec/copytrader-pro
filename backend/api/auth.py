@@ -1,4 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+import re
+from fastapi import APIRouter, HTTPException, Depends, status, Request
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 import httpx
@@ -11,14 +14,33 @@ import structlog
 
 log = structlog.get_logger(__name__)
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+limiter = Limiter(key_func=get_remote_address)
+
+PASSWORD_MIN_LENGTH = 8
+PASSWORD_REGEX = re.compile(r"[0-9!@#$%^&*()\-_=+\[\]{};:',.<>?/\\|`~]")
+
+
+def _validate_password(password: str) -> None:
+    if len(password) < PASSWORD_MIN_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Le mot de passe doit contenir au moins {PASSWORD_MIN_LENGTH} caractères."
+        )
+    if not PASSWORD_REGEX.search(password):
+        raise HTTPException(
+            status_code=400,
+            detail="Le mot de passe doit contenir au moins un chiffre ou caractère spécial."
+        )
 
 
 @router.post("/register", response_model=Token)
-async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def register(request: Request, data: UserRegister, db: AsyncSession = Depends(get_db)):
+    _validate_password(data.password)
     # Check existing
     result = await db.execute(select(User).where(User.email == data.email))
     if result.scalar_one_or_none():
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Cet email est déjà utilisé.")
 
     user = User(
         email=data.email,
@@ -35,14 +57,15 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
+@limiter.limit("10/minute")
+async def login(request: Request, data: UserLogin, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(data.password, user.hashed_password):
+    if not user or not user.hashed_password or not verify_password(data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
+            detail="Email ou mot de passe incorrect.",
         )
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account disabled")

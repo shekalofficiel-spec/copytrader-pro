@@ -15,6 +15,14 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    if (form.password.length < 8) {
+      setError('Le mot de passe doit contenir au moins 8 caractères.')
+      return
+    }
+    if (!/[0-9!@#$%^&*()\-_=+]/.test(form.password)) {
+      setError('Le mot de passe doit contenir au moins un chiffre ou caractère spécial.')
+      return
+    }
     setLoading(true)
     try {
       const data = await authApi.register(form)

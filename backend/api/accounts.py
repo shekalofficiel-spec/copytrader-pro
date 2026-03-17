@@ -78,23 +78,15 @@ async def create_account(
                 detail=f"Slave limit reached ({current_user.max_slaves}) for your plan. Upgrade to add more.",
             )
 
-    # Validate credentials by attempting a real connection (except MT4 which needs local EA bridge)
-    from connectors import get_connector
-    if payload.broker_type != "MT4":
-        try:
-            tmp = get_connector(payload.broker_type, payload.credentials, 0)
-            connected = await tmp.connect()
-            if not connected:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Could not connect to {payload.broker_type} with the provided credentials. "
-                           "Please verify your login, password and server."
-                )
-            await tmp.disconnect()
-        except HTTPException:
-            raise
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Connection error: {str(e)}")
+    # Validate credentials before saving
+    from core.broker_validator import validate_broker
+    ok, err = await validate_broker(str(payload.broker_type), payload.credentials)
+    if not ok:
+        raise HTTPException(status_code=400, detail=err)
+
+    # is_verified = True only for brokers we can actually confirm server-side
+    from core.broker_validator import VERIFIABLE
+    is_verified = str(payload.broker_type) in VERIFIABLE
 
     encrypted = encrypt_credentials(payload.credentials)
     account = Account(
@@ -119,6 +111,7 @@ async def create_account(
         no_trade_weekend=payload.no_trade_weekend,
         no_trade_news=payload.no_trade_news,
         allowed_instruments=payload.allowed_instruments,
+        is_verified=is_verified,
     )
     db.add(account)
     await db.flush()
@@ -185,15 +178,35 @@ async def test_connection(
     account = await _get_user_account(account_id, current_user, db)
     from core.encryption import decrypt_credentials
     from connectors import get_connector
+    from core.encryption import decrypt_credentials
+    from connectors import get_connector
+    from core.broker_validator import validate_broker, VERIFIABLE
     try:
         creds = decrypt_credentials(account.credentials_encrypted)
-        connector = get_connector(account.broker_type, creds, account.id)
-        connected = await connector.connect()
-        if connected:
-            info = await connector.get_account_info()
-            await connector.disconnect()
-            return {"success": True, "account_info": info}
-        return {"success": False, "error": "Connection failed"}
+        ok, err = await validate_broker(str(account.broker_type), creds)
+        if ok and str(account.broker_type) in VERIFIABLE:
+            # Also do a live connect to get account info
+            connector = get_connector(account.broker_type, creds, account.id)
+            connected = await connector.connect()
+            if connected:
+                info = await connector.get_account_info()
+                await connector.disconnect()
+                account.is_verified = True
+                await db.commit()
+                return {"success": True, "account_info": info}
+            return {"success": False, "error": "Connexion refusée par le broker."}
+        elif ok:
+            # Client-side broker (MT4/MT5) — can't verify server-side, attempt direct connect
+            connector = get_connector(account.broker_type, creds, account.id)
+            connected = await connector.connect()
+            if connected:
+                info = await connector.get_account_info()
+                await connector.disconnect()
+                account.is_verified = True
+                await db.commit()
+                return {"success": True, "account_info": info}
+            return {"success": False, "error": "Connexion impossible. Vérifie tes credentials et que MT5 est ouvert."}
+        return {"success": False, "error": err}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
