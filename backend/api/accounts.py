@@ -78,6 +78,24 @@ async def create_account(
                 detail=f"Slave limit reached ({current_user.max_slaves}) for your plan. Upgrade to add more.",
             )
 
+    # Validate credentials by attempting a real connection (except MT4 which needs local EA bridge)
+    from connectors import get_connector
+    if payload.broker_type != "MT4":
+        try:
+            tmp = get_connector(payload.broker_type, payload.credentials, 0)
+            connected = await tmp.connect()
+            if not connected:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Could not connect to {payload.broker_type} with the provided credentials. "
+                           "Please verify your login, password and server."
+                )
+            await tmp.disconnect()
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=400, detail=f"Connection error: {str(e)}")
+
     encrypted = encrypt_credentials(payload.credentials)
     account = Account(
         user_id=current_user.id,
@@ -94,6 +112,10 @@ async def create_account(
         min_margin_level=payload.min_margin_level,
         max_lot_size=payload.max_lot_size,
         prop_firm_mode=payload.prop_firm_mode,
+        prop_firm_rules=payload.prop_firm_rules,
+        profit_target_pct=payload.profit_target_pct,
+        daily_drawdown_pct=payload.daily_drawdown_pct,
+        total_drawdown_pct=payload.total_drawdown_pct,
         no_trade_weekend=payload.no_trade_weekend,
         no_trade_news=payload.no_trade_news,
         allowed_instruments=payload.allowed_instruments,

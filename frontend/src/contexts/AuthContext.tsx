@@ -24,13 +24,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken && storedUser) {
       setToken(storedToken)
       setUser(JSON.parse(storedUser))
-      // Re-validate token silently
-      authApi.me().catch(() => {
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('auth_user')
-        setToken(null)
-        setUser(null)
-      })
+      // Re-validate token and refresh user data from backend
+      authApi.me()
+        .then((freshUser) => {
+          // Always sync latest data (onboarding_completed, subscription_tier, etc.)
+          localStorage.setItem('auth_user', JSON.stringify(freshUser))
+          setUser(freshUser)
+        })
+        .catch(() => {
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('auth_user')
+          setToken(null)
+          setUser(null)
+        })
     }
     setIsLoading(false)
   }, [])

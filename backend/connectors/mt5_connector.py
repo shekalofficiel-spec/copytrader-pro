@@ -42,9 +42,9 @@ class MT5Connector(BaseBrokerConnector):
 
     async def connect(self) -> bool:
         if not MT5_AVAILABLE:
-            log.warning("MT5 not available, running in simulation mode")
-            self._connected = True
-            return True
+            log.warning("MT5 not available — MetaTrader5 requires Windows. Use METAAPI broker type instead.")
+            self._connected = False
+            return False
 
         def _init():
             if not mt5.initialize():
@@ -205,7 +205,7 @@ class MT5Connector(BaseBrokerConnector):
 
     async def get_account_info(self) -> dict:
         if not MT5_AVAILABLE:
-            return {"balance": None, "equity": None, "margin": 0.0, "margin_level": 0.0}
+            return {}
 
         def _info():
             info = mt5.account_info()
