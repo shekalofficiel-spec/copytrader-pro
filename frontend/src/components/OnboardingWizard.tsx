@@ -95,43 +95,45 @@ function StepMaster({ onNext }: { onNext: () => void }) {
     try {
       const credentials = broker === 'MT5' || broker === 'MT4'
         ? { login: parseInt(form.login) || 0, password: form.password, server: form.server }
-        : { api_key: form.api_key, api_secret: form.api_secret, futures: true, testnet: false }
+        : { api_key: form.api_key, api_secret: form.api_secret, futures: false, testnet: false }
 
-      // Create account then test
-      const account = await accountsApi.create({
-        name: `Master ${broker}`,
-        broker_type: broker,
-        role: 'MASTER',
-        credentials,
-        lot_mode: 'RATIO',
-        lot_ratio: 1.0,
-        fixed_lot_size: 0.01,
-        risk_percent: 1.0,
-        max_drawdown_pct: 5.0,
-        max_trades: 10,
-        min_margin_level: 200,
-        max_lot_size: 10,
-        prop_firm_mode: false,
-        no_trade_weekend: false,
-        no_trade_news: false,
-        allowed_instruments: [],
-      })
-      setCreatedId(account.id)
+      // Create account (non-blocking, always saves)
+      let accountId = createdId
+      if (!accountId) {
+        const account = await accountsApi.create({
+          name: `Master ${broker}`,
+          broker_type: broker,
+          role: 'MASTER',
+          credentials,
+          lot_mode: 'RATIO',
+          lot_ratio: 1.0,
+          fixed_lot_size: 0.01,
+          risk_percent: 1.0,
+          max_drawdown_pct: 5.0,
+          max_trades: 10,
+          min_margin_level: 200,
+          max_lot_size: 10,
+          prop_firm_mode: false,
+          no_trade_weekend: false,
+          no_trade_news: false,
+          allowed_instruments: [],
+        })
+        accountId = account.id
+        setCreatedId(accountId)
+      }
 
-      const result = await accountsApi.testConnection(account.id)
+      // Test connection
+      const result = await accountsApi.testConnection(accountId)
       if (result.success) {
         setStatus('success')
       } else {
         setStatus('error')
         setErrorMsg(result.error || 'Connexion échouée')
-        await accountsApi.delete(account.id)
-        setCreatedId(null)
       }
     } catch (err: unknown) {
       setStatus('error')
-      const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErrorMsg(msg || 'Erreur de connexion')
-      if (createdId) { await accountsApi.delete(createdId); setCreatedId(null) }
+      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setErrorMsg(detail || 'Erreur réseau — vérifie ta connexion.')
     }
   }
 
@@ -218,8 +220,8 @@ function StepMaster({ onNext }: { onNext: () => void }) {
         </div>
       )}
 
-      <div className="flex gap-3 pt-1">
-        {status === 'success' && createdId ? (
+      <div className="flex gap-3 pt-1 flex-wrap">
+        {status === 'success' ? (
           <button
             onClick={onNext}
             className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] transition-all"
@@ -234,6 +236,14 @@ function StepMaster({ onNext }: { onNext: () => void }) {
           >
             <Wifi className="w-4 h-4" />
             {status === 'testing' ? 'Vérification...' : 'Tester et continuer'}
+          </button>
+        )}
+        {status === 'error' && createdId && (
+          <button
+            onClick={onNext}
+            className="flex items-center gap-1.5 text-sm text-[#555] hover:text-[#8a8a8a] transition-colors"
+          >
+            <SkipForward className="w-3.5 h-3.5" /> Continuer quand même
           </button>
         )}
       </div>

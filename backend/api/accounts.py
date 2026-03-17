@@ -78,15 +78,13 @@ async def create_account(
                 detail=f"Slave limit reached ({current_user.max_slaves}) for your plan. Upgrade to add more.",
             )
 
-    # Validate credentials before saving
-    from core.broker_validator import validate_broker
-    ok, err = await validate_broker(str(payload.broker_type), payload.credentials)
-    if not ok:
-        raise HTTPException(status_code=400, detail=err)
-
-    # is_verified = True only for brokers we can actually confirm server-side
-    from core.broker_validator import VERIFIABLE
-    is_verified = str(payload.broker_type) in VERIFIABLE
+    # Try to validate credentials — non-blocking (IP restrictions, timeout, etc. shouldn't prevent saving)
+    from core.broker_validator import validate_broker, VERIFIABLE
+    try:
+        ok, _ = await validate_broker(str(payload.broker_type), payload.credentials)
+    except Exception:
+        ok = False
+    is_verified = ok and str(payload.broker_type) in VERIFIABLE
 
     encrypted = encrypt_credentials(payload.credentials)
     account = Account(
