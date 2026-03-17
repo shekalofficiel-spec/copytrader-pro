@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import {
   Zap, CheckCircle, AlertCircle, ChevronRight, SkipForward,
   Wifi, Bell, Users
@@ -484,16 +483,14 @@ export default function OnboardingWizard() {
   const [step, setStep] = useState(0)
   const [showToast, setShowToast] = useState(false)
 
-  const completeMut = useMutation({
-    mutationFn: () => authApi.updateMe({ onboarding_completed: true }),
-    onSuccess: () => {
-      updateUser({ onboarding_completed: true })
-      setShowToast(true)
-      setTimeout(() => setShowToast(false), 4000)
-    },
-  })
-
-  const handleFinish = () => completeMut.mutate()
+  const handleFinish = async () => {
+    // Close wizard immediately — don't wait for API
+    updateUser({ onboarding_completed: true })
+    setShowToast(true)
+    setTimeout(() => setShowToast(false), 4000)
+    // Fire API in background
+    authApi.updateMe({ onboarding_completed: true }).catch(() => {})
+  }
 
   return (
     <>
