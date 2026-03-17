@@ -65,7 +65,8 @@ class CopyEngine:
         """Load active accounts from DB and establish connections."""
         from sqlalchemy import select
         result = await db.execute(select(Account).where(Account.is_active == True))
-        self._accounts = result.scalars().all()
+        # Convert to plain list to avoid lazy-loading issues in background tasks
+        self._accounts = list(result.scalars().all())
 
         for account in self._accounts:
             await self._connect_account(account)
@@ -425,6 +426,12 @@ class CopyEngine:
 
     async def add_account(self, account: Account):
         """Hot-add a new account to the running engine."""
+        # Detach from session to avoid greenlet issues in background tasks
+        from sqlalchemy.orm import make_transient
+        try:
+            make_transient(account)
+        except Exception:
+            pass
         self._accounts.append(account)
         await self._connect_account(account)
         if account.role == AccountRole.MASTER:
