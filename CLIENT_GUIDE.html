@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CopyTrader Pro — Guide d'installation client</title>
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0a0a0f;
+      --bg-card:   #13131a;
+      --bg-card2:  #1a1a24;
+      --gold:      #f0b429;
+      --gold-dim:  #c89520;
+      --text:      #e8e8f0;
+      --text-muted:#8888aa;
+      --border:    #2a2a3a;
+      --green:     #00c070;
+      --green-bg:  #00200f;
+      --orange:    #f0851a;
+      --orange-bg: #1f0e00;
+      --red:       #ff4d6d;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ─── Layout ─── */
+    .page-wrap {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 32px 80px;
+    }
+
+    /* ─── Page breaks ─── */
+    .section {
+      padding-top: 56px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+
+    /* ─── Cover ─── */
+    .cover {
+      min-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding-top: 80px;
+      padding-bottom: 80px;
+    }
+
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      border: 2px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: -1px;
+    }
+
+    .logo-text {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+    }
+
+    .cover-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .cover-title span { color: var(--gold); }
+
+    .cover-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 48px;
+      max-width: 520px;
+    }
+
+    .cover-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 56px;
+    }
+
+    .cover-bullets li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .bullet-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #000;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .cover-meta {
+      margin-top: auto;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    /* ─── Table of Contents ─── */
+    .toc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      text-decoration: none;
+      color: var(--text);
+      transition: border-color 0.15s;
+    }
+
+    .toc-item:hover { border-color: var(--gold-dim); }
+
+    .toc-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      min-width: 24px;
+    }
+
+    .toc-label { font-size: 14px; }
+
+    /* ─── Section headings ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .step-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #000;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      margin-bottom: 2px;
+    }
+
+    h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--gold);
+      margin-top: 28px;
+      margin-bottom: 12px;
+    }
+
+    p { margin-bottom: 14px; color: var(--text); }
+
+    /* ─── Instruction list ─── */
+    .steps-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    .steps-list li {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(240, 180, 41, 0.15);
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content { flex: 1; }
+
+    .step-content strong {
+      color: #ffffff;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .step-content small { color: var(--text-muted); font-size: 13px; }
+
+    /* ─── Inline code / path ─── */
+    code {
+      background: rgba(240, 180, 41, 0.12);
+      border: 1px solid rgba(240, 180, 41, 0.25);
+      color: var(--gold);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-family: "Menlo", "Consolas", monospace;
+      font-size: 13px;
+    }
+
+    .url-block {
+      display: block;
+      background: var(--bg-card2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: "Menlo", "Consolas", monospace;
+      font-size: 13px;
+      color: var(--gold);
+      word-break: break-all;
+      margin: 16px 0;
+    }
+
+    /* ─── Screenshot placeholder ─── */
+    .screenshot {
+      width: 100%;
+      background: #1a1a24;
+      border: 1.5px dashed var(--border);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 40px 20px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .screenshot .ph-icon {
+      font-size: 32px;
+      opacity: 0.4;
+    }
+
+    /* ─── Info Card ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 20px 0;
+    }
+
+    /* ─── Table ─── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      background: rgba(240, 180, 41, 0.12);
+      color: var(--gold);
+      font-weight: 600;
+      text-align: left;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .data-table td {
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: "Menlo", "Consolas", monospace;
+      font-size: 12.5px;
+    }
+
+    .data-table tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-gold { background: rgba(240,180,41,0.15); color: var(--gold); }
+    .badge-blue { background: rgba(80,140,255,0.15); color: #80aaff; }
+
+    /* ─── Warning / Success boxes ─── */
+    .box {
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .box-warning {
+      background: var(--orange-bg);
+      border: 1px solid rgba(240, 133, 26, 0.35);
+    }
+
+    .box-success {
+      background: var(--green-bg);
+      border: 1px solid rgba(0, 192, 112, 0.3);
+    }
+
+    .box-danger {
+      background: rgba(255, 77, 109, 0.07);
+      border: 1px solid rgba(255, 77, 109, 0.3);
+    }
+
+    .box-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .box-warning .box-title { color: var(--orange); }
+    .box-success .box-title { color: var(--green); }
+    .box-danger  .box-title { color: var(--red); }
+
+    .box-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 14px;
+    }
+
+    .box-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── Param table (EA settings) ─── */
+    .param-grid {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .param-key {
+      background: rgba(240, 180, 41, 0.08);
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--gold);
+      font-family: "Menlo", "Consolas", monospace;
+      font-size: 13px;
+    }
+
+    .param-val {
+      background: var(--bg-card);
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .param-key:last-of-type,
+    .param-val:last-child { border-bottom: none; }
+
+    /* ─── Divider ─── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    /* ─── Kill switch ─── */
+    .kill-btn {
+      display: inline-block;
+      background: var(--red);
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 28px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+      margin: 12px 0;
+    }
+
+    /* ─── Section tag ─── */
+    .section-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+      border: 1px solid rgba(240,180,41,0.3);
+      border-radius: 20px;
+      padding: 3px 12px;
+      margin-bottom: 20px;
+    }
+
+    /* ─── Checkmark list ─── */
+    .check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 12px 0;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 14px;
+    }
+
+    .check-list .ck { color: var(--green); font-size: 16px; }
+
+    /* ─── Footer line ─── */
+    .doc-footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 32px 0 0;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* ─── PRINT ─── */
+    @media print {
+      :root {
+        /* Keep dark theme for PDF export — comment out below to force white */
+      }
+
+      html, body {
+        background: #0a0a0f;
+        color: #e8e8f0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .page-wrap { padding: 0 24px; }
+
+      .cover { min-height: auto; padding: 48px 0 60px; }
+
+      .section { page-break-before: always; }
+      .cover   { page-break-before: avoid; }
+      .toc-section { page-break-after: always; }
+
+      a { color: var(--gold); text-decoration: none; }
+
+      .toc-item { page-break-inside: avoid; }
+      .card     { page-break-inside: avoid; }
+      .box      { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrap">
+
+  <!-- ══════════════════════════════════════════
+       COVER PAGE
+  ══════════════════════════════════════════ -->
+  <div class="cover section" id="cover">
+
+    <div class="logo-mark">
+      <div class="logo-icon">CT</div>
+      <span class="logo-text">CopyTrader Pro</span>
+    </div>
+
+    <h1 class="cover-title">
+      Guide d'installation<br>
+      <span>Copie automatique</span><br>
+      entre comptes MT5
+    </h1>
+
+    <p class="cover-subtitle">
+      Configurez votre système de copy trading en moins de 30 minutes.
+      Aucune connaissance technique avancée requise.
+    </p>
+
+    <ul class="cover-bullets">
+      <li>
+        <div class="bullet-check">✓</div>
+        <span>Vous tradez normalement sur votre compte principal — rien ne change dans votre routine.</span>
+      </li>
+      <li>
+        <div class="bullet-check">✓</div>
+        <span>Tous vos autres comptes copient instantanément chaque trade, en temps réel.</span>
+      </li>
+      <li>
+        <div class="bullet-check">✓</div>
+        <span>Zéro intervention manuelle après la configuration initiale.</span>
+      </li>
+    </ul>
+
+    <div class="cover-meta">
+      <span>CopyTrader Pro — Document confidentiel</span>
+      <span>Version 1.0 — Mars 2026</span>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       TABLE OF CONTENTS
+  ══════════════════════════════════════════ -->
+  <div class="section toc-section" id="toc">
+
+    <div class="section-tag">Sommaire</div>
+    <h2>Table des matières</h2>
+
+    <div class="toc-grid">
+      <a class="toc-item" href="#step1">
+        <span class="toc-num">01</span>
+        <span class="toc-label">Créer votre compte</span>
+      </a>
+      <a class="toc-item" href="#step2">
+        <span class="toc-num">02</span>
+        <span class="toc-label">Ajouter vos comptes MT5</span>
+      </a>
+      <a class="toc-item" href="#step3">
+        <span class="toc-num">03</span>
+        <span class="toc-label">Générer les tokens EA</span>
+      </a>
+      <a class="toc-item" href="#step4">
+        <span class="toc-num">04</span>
+        <span class="toc-label">Installer l'EA dans MT5</span>
+      </a>
+      <a class="toc-item" href="#step5">
+        <span class="toc-num">05</span>
+        <span class="toc-label">Configurer l'EA sur chaque compte</span>
+      </a>
+      <a class="toc-item" href="#step6">
+        <span class="toc-num">06</span>
+        <span class="toc-label">Tester la connexion</span>
+      </a>
+      <a class="toc-item" href="#warnings">
+        <span class="toc-num">07</span>
+        <span class="toc-label">Avertissements importants</span>
+      </a>
+      <a class="toc-item" href="#killswitch">
+        <span class="toc-num">08</span>
+        <span class="toc-label">Kill Switch — Urgence</span>
+      </a>
+    </div>
+
+    <div class="box box-success" style="margin-top: 28px;">
+      <div class="box-title">Avant de commencer</div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>MetaTrader 5 installé sur votre ordinateur (version desktop)</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Vos identifiants de connexion pour chaque compte MT5 (numéro de compte + mot de passe)</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Le fichier <code>CopyTradeBridgeMT5.mq5</code> fourni par votre gestionnaire</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Une connexion internet stable</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 1 — CRÉER LE COMPTE
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step1">
+
+    <div class="section-tag">Étape 1 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">1</div>
+      <div>
+        <div class="step-label">Première étape</div>
+        <h2>Créer votre compte CopyTrader Pro</h2>
+      </div>
+    </div>
+
+    <p>
+      Rendez-vous sur le portail d'inscription pour créer votre compte personnel.
+      Ce compte vous permettra de gérer l'ensemble de vos comptes de trading depuis un seul tableau de bord.
+    </p>
+
+    <span class="url-block">https://frontend-pearl-nu-68.vercel.app/register</span>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Remplir le formulaire d'inscription</strong>
+          Saisissez votre Nom complet, votre adresse Email et choisissez un Mot de passe sécurisé.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Cliquer sur "Create one free"</strong>
+          Votre compte est créé instantanément — aucune carte bancaire requise.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Se connecter au dashboard</strong>
+          Vous serez redirigé automatiquement vers votre tableau de bord.
+        </div>
+      </li>
+    </ol>
+
+    <div class="screenshot">
+      <div class="ph-icon">🖥</div>
+      <div>Écran d'inscription — frontend-pearl-nu-68.vercel.app/register</div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 2 — AJOUTER COMPTES MT5
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step2">
+
+    <div class="section-tag">Étape 2 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">2</div>
+      <div>
+        <div class="step-label">Deuxième étape</div>
+        <h2>Ajouter vos comptes MT5</h2>
+      </div>
+    </div>
+
+    <p>
+      Depuis votre tableau de bord, vous allez enregistrer chacun de vos comptes MT5.
+      Un compte sera désigné <strong>MASTER</strong> (le compte où vous tradez),
+      les autres seront désignés <strong>SLAVE</strong> (les comptes qui copient).
+    </p>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Aller dans "Accounts"</strong>
+          Dans le menu latéral du dashboard, cliquez sur <code>Accounts</code>.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Cliquer sur "Add Account"</strong>
+          Le formulaire d'ajout de compte s'ouvre.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Remplir les informations pour chaque compte</strong>
+          Voir les champs détaillés ci-dessous.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">4</div>
+        <div class="step-content">
+          <strong>Répéter pour chaque compte MT5</strong>
+          Ajoutez d'abord le MASTER, puis chaque SLAVE un par un.
+        </div>
+      </li>
+    </ol>
+
+    <hr class="divider" />
+
+    <h3>Détail des champs à remplir</h3>
+
+    <div class="param-grid">
+      <div class="param-key">Nom du compte</div>
+      <div class="param-val">Un nom lisible, ex: <em>"Mon Exness Master"</em> ou <em>"FTMO Compte 1"</em></div>
+      <div class="param-key">Broker</div>
+      <div class="param-val">Saisissez <code>METAAPI</code> — ce champ est utilisé pour l'identification interne</div>
+      <div class="param-key">Rôle</div>
+      <div class="param-val">
+        <span class="badge badge-gold">MASTER</span> — votre compte principal (vous tradez dessus)<br>
+        <span class="badge badge-blue">SLAVE</span> — les comptes qui copient automatiquement
+      </div>
+      <div class="param-key">Ratio</div>
+      <div class="param-val">
+        <code>1.0</code> = copie exacte des lots &nbsp;|&nbsp;
+        <code>0.5</code> = moitié des lots &nbsp;|&nbsp;
+        <code>2.0</code> = double des lots
+      </div>
+    </div>
+
+    <div class="box box-warning">
+      <div class="box-title">Important — Rôles</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Vous ne pouvez avoir <strong>qu'un seul compte MASTER</strong> actif à la fois. Tous vos autres comptes doivent être en mode SLAVE.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 3 — GÉNÉRER LES TOKENS
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step3">
+
+    <div class="section-tag">Étape 3 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">3</div>
+      <div>
+        <div class="step-label">Troisième étape</div>
+        <h2>Générer les tokens EA</h2>
+      </div>
+    </div>
+
+    <p>
+      Chaque compte nécessite un <strong>token d'authentification</strong> unique.
+      Ce token est utilisé par l'EA dans MT5 pour communiquer avec le serveur CopyTrader Pro de façon sécurisée.
+    </p>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Sélectionner un compte dans la liste</strong>
+          Cliquez sur le compte pour ouvrir ses détails.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Cliquer sur "Generate EA Token"</strong>
+          Un token JWT est généré et affiché à l'écran.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Copier et conserver le token</strong>
+          Copiez-le immédiatement dans un endroit sécurisé (ex: un document local). Il ne sera affiché qu'une seule fois en clair.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">4</div>
+        <div class="step-content">
+          <strong>Copier l'Account ID</strong>
+          L'Account ID est visible sur la même page — notez-le également.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">5</div>
+        <div class="step-content">
+          <strong>Répéter pour chaque compte</strong>
+          Chaque compte (MASTER et chaque SLAVE) a son propre token et Account ID.
+        </div>
+      </li>
+    </ol>
+
+    <hr class="divider" />
+
+    <h3>Exemple de tableau de suivi</h3>
+    <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+      Nous vous recommandons de compléter ce tableau avec vos informations réelles et de le conserver en lieu sûr.
+    </p>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Compte</th>
+          <th>Rôle</th>
+          <th>Account ID</th>
+          <th>Token EA (début)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mon Exness</td>
+          <td><span class="badge badge-gold">MASTER</span></td>
+          <td>abc-1234-...</td>
+          <td>eyJhbGci...</td>
+        </tr>
+        <tr>
+          <td>FTMO Compte 1</td>
+          <td><span class="badge badge-blue">SLAVE</span></td>
+          <td>def-5678-...</td>
+          <td>eyJhbGci...</td>
+        </tr>
+        <tr>
+          <td>Compte 3</td>
+          <td><span class="badge badge-blue">SLAVE</span></td>
+          <td>ghi-9012-...</td>
+          <td>eyJhbGci...</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="box box-warning">
+      <div class="box-title">Sécurité des tokens</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Traitez vos tokens comme des mots de passe. Ne les partagez jamais par email ou messagerie non sécurisée.</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Si un token est compromis, revenez sur le dashboard et régénérez-en un nouveau.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 4 — INSTALLER L'EA
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step4">
+
+    <div class="section-tag">Étape 4 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">4</div>
+      <div>
+        <div class="step-label">Quatrième étape</div>
+        <h2>Installer l'EA dans MetaTrader 5</h2>
+      </div>
+    </div>
+
+    <p>
+      L'Expert Advisor (EA) est le programme qui s'exécute directement dans MT5 et qui assure la communication
+      avec le serveur CopyTrader Pro. Cette installation se fait <strong>une seule fois</strong> sur chaque ordinateur.
+    </p>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Télécharger le fichier EA</strong>
+          Récupérez le fichier <code>CopyTradeBridgeMT5.mq5</code> auprès de votre gestionnaire.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Ouvrir le dossier des données MT5</strong>
+          Dans MetaTrader 5 : <code>Fichier</code> → <code>Ouvrir le dossier des données</code>
+          <br><small>Ou appuyez sur Ctrl+Shift+D</small>
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Naviguer vers le dossier Experts</strong>
+          Dans le dossier qui s'ouvre : <code>MQL5</code> → <code>Experts</code>
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">4</div>
+        <div class="step-content">
+          <strong>Coller le fichier .mq5</strong>
+          Copiez <code>CopyTradeBridgeMT5.mq5</code> dans ce dossier <code>Experts</code>.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">5</div>
+        <div class="step-content">
+          <strong>Autoriser les requêtes WebRequest</strong>
+          Dans MT5 : <code>Outils</code> → <code>Options</code> → onglet <code>Expert Advisors</code>
+          <br><small>Cocher "Autoriser les requêtes WebRequest pour les URLs listées" puis ajouter l'URL ci-dessous.</small>
+        </div>
+      </li>
+    </ol>
+
+    <div class="card" style="margin-top: 4px;">
+      <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">URL à autoriser dans MT5</div>
+      <span class="url-block" style="margin: 0;">https://copytrader-pro-production.up.railway.app</span>
+    </div>
+
+    <ol class="steps-list" style="margin-top: 20px;">
+      <li>
+        <div class="step-num-sm">6</div>
+        <div class="step-content">
+          <strong>Compiler l'EA</strong>
+          De retour dans MT5, dans le Navigateur : faites un clic droit sur <code>CopyTradeBridgeMT5</code>
+          → <code>Modifier</code>. L'éditeur MetaEditor s'ouvre. Appuyez sur <strong>F7</strong> pour compiler.
+          <br><small>La compilation doit se terminer sans erreur (0 erreur, 0 warning).</small>
+        </div>
+      </li>
+    </ol>
+
+    <div class="box box-success">
+      <div class="box-title">Compilation réussie</div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>La barre en bas de MetaEditor affiche <strong>0 erreur(s), 0 avertissement(s)</strong>. L'EA est prêt à être utilisé.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 5 — CONFIGURER L'EA
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step5">
+
+    <div class="section-tag">Étape 5 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">5</div>
+      <div>
+        <div class="step-label">Cinquième étape</div>
+        <h2>Configurer l'EA sur chaque compte</h2>
+      </div>
+    </div>
+
+    <p>
+      Cette étape doit être réalisée <strong>séparément sur chaque compte MT5</strong> (MASTER et chaque SLAVE).
+      Connectez-vous au bon compte MT5 avant de commencer.
+    </p>
+
+    <!-- MASTER -->
+    <div class="card">
+      <h3 style="margin-top: 0; color: var(--gold);">Sur le compte MASTER</h3>
+
+      <ol class="steps-list">
+        <li>
+          <div class="step-num-sm">1</div>
+          <div class="step-content">
+            <strong>Ouvrir un graphique</strong>
+            Double-cliquez sur n'importe quelle paire (ex: <code>EURUSD H1</code>) pour ouvrir un graphique.
+          </div>
+        </li>
+        <li>
+          <div class="step-num-sm">2</div>
+          <div class="step-content">
+            <strong>Glisser l'EA sur le graphique</strong>
+            Dans le Navigateur (panneau gauche), sous <code>Expert Advisors</code>, trouvez <code>CopyTradeBridgeMT5</code>
+            et faites-le glisser sur le graphique ouvert.
+          </div>
+        </li>
+        <li>
+          <div class="step-num-sm">3</div>
+          <div class="step-content">
+            <strong>Remplir les paramètres</strong>
+            Une fenêtre de paramètres s'ouvre — configurez-la comme suit :
+          </div>
+        </li>
+      </ol>
+
+      <div class="param-grid" style="margin-top: 16px;">
+        <div class="param-key">BackendURL</div>
+        <div class="param-val"><code>https://copytrader-pro-production.up.railway.app</code></div>
+        <div class="param-key">AccountToken</div>
+        <div class="param-val">Votre token MASTER (commençant par <code>eyJ...</code>)</div>
+        <div class="param-key">AccountID</div>
+        <div class="param-val">Votre Account ID MASTER (ex: <code>abc-1234-...</code>)</div>
+        <div class="param-key">Mode</div>
+        <div class="param-val"><code>MASTER</code></div>
+      </div>
+
+      <ol class="steps-list" style="margin-top: 16px;">
+        <li>
+          <div class="step-num-sm">4</div>
+          <div class="step-content">
+            <strong>Cliquer OK</strong>
+            L'EA se lance. Dans le coin supérieur droit du graphique, vous devez voir :<br>
+            <code style="color: var(--green);">✅ CopyTrader Pro MASTER actif</code>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SLAVE -->
+    <div class="card" style="margin-top: 20px;">
+      <h3 style="margin-top: 0; color: #80aaff;">Sur chaque compte SLAVE</h3>
+
+      <p style="margin-bottom: 16px;">La procédure est identique, mais avec les informations propres au compte SLAVE concerné.</p>
+
+      <div class="param-grid">
+        <div class="param-key">BackendURL</div>
+        <div class="param-val"><code>https://copytrader-pro-production.up.railway.app</code></div>
+        <div class="param-key">AccountToken</div>
+        <div class="param-val">Le token de <em>ce compte SLAVE</em></div>
+        <div class="param-key">AccountID</div>
+        <div class="param-val">L'Account ID de <em>ce compte SLAVE</em></div>
+        <div class="param-key">Mode</div>
+        <div class="param-val"><code>SLAVE</code></div>
+      </div>
+
+      <div class="box box-success" style="margin-top: 16px;">
+        <div class="box-item">
+          <span class="box-icon">✓</span>
+          <span>Message attendu : <code style="color: var(--green);">✅ CopyTrader Pro SLAVE actif</code></span>
+        </div>
+      </div>
+
+      <div class="box box-warning" style="margin: 0;">
+        <div class="box-item">
+          <span class="box-icon">⚠</span>
+          <span>Chaque compte SLAVE a ses propres token et Account ID. Ne mélangez pas les tokens entre comptes.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       ÉTAPE 6 — TESTER
+  ══════════════════════════════════════════ -->
+  <div class="section" id="step6">
+
+    <div class="section-tag">Étape 6 sur 6</div>
+
+    <div class="section-header">
+      <div class="step-circle">6</div>
+      <div>
+        <div class="step-label">Sixième étape</div>
+        <h2>Tester la connexion</h2>
+      </div>
+    </div>
+
+    <p>
+      Avant de commencer à trader normalement, effectuez un test rapide pour valider que la copie fonctionne correctement.
+    </p>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Ouvrir un micro trade sur le compte MASTER</strong>
+          Sur le compte MASTER (avec l'EA actif), ouvrez manuellement un trade de <code>0.01 lot</code>
+          sur n'importe quelle paire. Utilisez un trade de test — la taille minimale suffit.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Vérifier les comptes SLAVE dans les 2 secondes</strong>
+          Basculez sur vos comptes SLAVE. Le même trade doit apparaître automatiquement
+          (avec les lots ajustés selon le ratio configuré).
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Vérifier le dashboard CopyTrader Pro</strong>
+          Ouvrez le dashboard dans votre navigateur — le trade en cours doit être visible en temps réel.
+        </div>
+      </li>
+    </ol>
+
+    <span class="url-block">https://frontend-pearl-nu-68.vercel.app</span>
+
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">4</div>
+        <div class="step-content">
+          <strong>Clôturer le trade de test</strong>
+          Clôturez le trade sur le compte MASTER. Il doit se clôturer automatiquement sur tous les comptes SLAVE.
+        </div>
+      </li>
+    </ol>
+
+    <div class="box box-success">
+      <div class="box-title">Test réussi — Système opérationnel</div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Le trade est apparu sur tous les SLAVE en moins de 2 secondes.</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>La clôture sur le MASTER a entraîné la clôture sur tous les SLAVE.</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Le dashboard affiche l'activité en temps réel.</span>
+      </div>
+    </div>
+
+    <div class="box box-warning">
+      <div class="box-title">Si le test échoue</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Vérifiez que l'URL WebRequest est bien autorisée dans MT5 (Outils → Options → Expert Advisors).</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Vérifiez que l'EA est bien actif sur tous les comptes (icône smiley en haut à droite du graphique dans MT5).</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span>Contactez votre gestionnaire si le problème persiste.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       AVERTISSEMENTS
+  ══════════════════════════════════════════ -->
+  <div class="section" id="warnings">
+
+    <div class="section-tag">Informations importantes</div>
+
+    <div class="section-header">
+      <div class="step-circle" style="background: var(--orange); font-size: 20px;">!</div>
+      <div>
+        <div class="step-label">À lire attentivement</div>
+        <h2>Avertissements et bonnes pratiques</h2>
+      </div>
+    </div>
+
+    <div class="box box-warning">
+      <div class="box-title">⚠ Fonctionnement de l'EA — Conditions requises</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span><strong>L'EA doit rester actif en permanence</strong> — MetaTrader 5 doit rester ouvert sur tous les comptes (MASTER et SLAVE) pour que la copie fonctionne. Si MT5 est fermé ou l'EA retiré, les trades ne seront plus copiés.</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span><strong>Pensez à utiliser un VPS</strong> si vous avez besoin d'un fonctionnement 24h/24. Demandez conseil à votre gestionnaire.</span>
+      </div>
+    </div>
+
+    <div class="box box-warning" style="margin-top: 16px;">
+      <div class="box-title">⚠ Comptes SLAVE — Ne pas intervenir manuellement</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span><strong>Ne modifiez pas manuellement les trades</strong> sur les comptes SLAVE. Les modifications manuelles (SL, TP, clôture partielle) peuvent créer des désynchronisations et générer des erreurs dans le système de copie.</span>
+      </div>
+    </div>
+
+    <div class="box box-warning" style="margin-top: 16px;">
+      <div class="box-title">⚠ Sécurité — Tokens confidentiels</div>
+      <div class="box-item">
+        <span class="box-icon">⚠</span>
+        <span><strong>Vos tokens EA sont confidentiels.</strong> Ne les partagez pas, ne les envoyez pas par email non sécurisé, et ne les publiez jamais en ligne. En cas de doute sur la sécurité d'un token, régénérez-en un nouveau depuis le dashboard.</span>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="box box-success">
+      <div class="box-title">📧 Support — Contactez votre gestionnaire</div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Pour toute question, problème technique ou demande de configuration, contactez directement votre gestionnaire CopyTrader Pro.</span>
+      </div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Préparez les informations suivantes lors de votre prise de contact : votre email de compte, le nom des comptes concernés, et une description précise du problème rencontré.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       KILL SWITCH
+  ══════════════════════════════════════════ -->
+  <div class="section" id="killswitch">
+
+    <div class="section-tag">Procédure d'urgence</div>
+
+    <div class="section-header">
+      <div class="step-circle" style="background: var(--red); font-size: 16px;">⏹</div>
+      <div>
+        <div class="step-label">En cas d'urgence</div>
+        <h2>Kill Switch — Arrêt d'urgence</h2>
+      </div>
+    </div>
+
+    <p>
+      Si vous devez stopper immédiatement <strong>tous les trades sur tous les comptes</strong>,
+      CopyTrader Pro propose un Kill Switch accessible en un clic depuis le dashboard.
+    </p>
+
+    <div class="box box-danger">
+      <div class="box-title">⛔ Attention — Action irréversible</div>
+      <div class="box-item">
+        <span class="box-icon">⛔</span>
+        <span>Le Kill Switch clôture <strong>tous les trades ouverts sur tous les comptes</strong> simultanément, aux prix du marché. Cette action ne peut pas être annulée. N'utilisez cette fonction qu'en cas d'urgence réelle.</span>
+      </div>
+    </div>
+
+    <h3>Méthode 1 — Via le Dashboard (recommandée)</h3>
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Ouvrir le dashboard CopyTrader Pro</strong>
+          <span class="url-block" style="display: inline-block; margin: 6px 0 0;">https://frontend-pearl-nu-68.vercel.app</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Localiser le bouton rouge "Kill Switch"</strong>
+          Il est visible en haut de votre dashboard, dans la barre de contrôle.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">3</div>
+        <div class="step-content">
+          <strong>Cliquer et confirmer</strong>
+          Une confirmation est demandée. Confirmez pour fermer tous les trades instantanément.
+          <br><br>
+          <span class="kill-btn">⏹ KILL SWITCH</span>
+        </div>
+      </li>
+    </ol>
+
+    <hr class="divider" />
+
+    <h3>Méthode 2 — Via MetaTrader 5 (si le dashboard est inaccessible)</h3>
+    <ol class="steps-list">
+      <li>
+        <div class="step-num-sm">1</div>
+        <div class="step-content">
+          <strong>Sur chaque compte MT5</strong>
+          Faites un clic droit sur le graphique où l'EA est actif → <code>Expert Advisors</code> → <code>Retirer</code>.
+        </div>
+      </li>
+      <li>
+        <div class="step-num-sm">2</div>
+        <div class="step-content">
+          <strong>Clôturer les trades manuellement</strong>
+          Une fois l'EA retiré, clôturez manuellement les trades ouverts depuis l'onglet <code>Trade</code> dans MT5.
+        </div>
+      </li>
+    </ol>
+
+    <div class="box box-success" style="margin-top: 28px;">
+      <div class="box-title">Système opérationnel — Vous êtes prêt</div>
+      <div class="box-item">
+        <span class="box-icon">✓</span>
+        <span>Votre système de copy trading est configuré et opérationnel. Tradez normalement sur votre compte MASTER — tout le reste est automatique.</span>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════ -->
+  <div class="doc-footer">
+    <strong style="color: var(--gold);">CopyTrader Pro</strong> — Document confidentiel réservé au client &nbsp;|&nbsp;
+    Version 1.0 — Mars 2026 &nbsp;|&nbsp;
+    <span>https://frontend-pearl-nu-68.vercel.app</span>
+  </div>
+
+</div>
+</body>
+</html>

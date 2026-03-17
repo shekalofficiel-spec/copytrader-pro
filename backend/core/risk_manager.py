@@ -4,7 +4,7 @@ All methods return (allowed: bool, reason: str).
 """
 from __future__ import annotations
 import asyncio
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import TYPE_CHECKING
 import structlog
 
@@ -50,6 +50,7 @@ class RiskManager:
             await self._check_drawdown(account, connector),
             self._check_max_lot(account, trade_event.lot_size),
             self._check_weekend(account),
+            await self._check_prop_firm(account, connector),
         ]
 
         for result in checks:
@@ -147,7 +148,59 @@ class RiskManager:
         # 0=Monday, 5=Saturday, 6=Sunday
         if now.weekday() in (5, 6):
             return RiskCheckResult(False, "Weekend trading disabled (prop firm mode)")
+        # Also block Friday after 21:00 UTC
+        if now.weekday() == 4 and now.hour >= 21:
+            return RiskCheckResult(False, "Friday 21:00 UTC cutoff — no new positions")
         return RiskCheckResult(True)
+
+    async def _check_prop_firm(
+        self, account: Account, connector: "BaseBrokerConnector"
+    ) -> RiskCheckResult:
+        """Enforce prop firm daily drawdown and total drawdown limits."""
+        if not account.prop_firm_mode:
+            return RiskCheckResult(True)
+        try:
+            info = await connector.get_account_info()
+            balance = info.get("balance", 0)
+            equity = info.get("equity", balance)
+            if balance <= 0:
+                return RiskCheckResult(True)
+
+            # Daily drawdown check
+            if account.daily_drawdown_pct:
+                daily_dd = ((balance - equity) / balance) * 100
+                if daily_dd >= account.daily_drawdown_pct:
+                    account.is_copy_paused = True
+                    await self._send_prop_firm_alert(account, f"Daily drawdown {daily_dd:.2f}% >= limit {account.daily_drawdown_pct:.2f}%")
+                    return RiskCheckResult(
+                        False,
+                        f"Prop firm daily drawdown limit reached: {daily_dd:.2f}% >= {account.daily_drawdown_pct:.2f}%",
+                    )
+
+            # Total drawdown check
+            if account.total_drawdown_pct:
+                total_dd = account.current_drawdown
+                if total_dd >= account.total_drawdown_pct:
+                    account.is_copy_paused = True
+                    await self._send_prop_firm_alert(account, f"Total drawdown {total_dd:.2f}% >= limit {account.total_drawdown_pct:.2f}%")
+                    return RiskCheckResult(
+                        False,
+                        f"Prop firm total drawdown limit reached: {total_dd:.2f}% >= {account.total_drawdown_pct:.2f}%",
+                    )
+        except Exception as e:
+            log.error("risk_check_prop_firm_error", error=str(e))
+        return RiskCheckResult(True)
+
+    async def _send_prop_firm_alert(self, account: Account, reason: str):
+        """Send Telegram alert for prop firm limit breach (best-effort)."""
+        try:
+            from tasks.celery_tasks import send_copy_notification, CELERY_AVAILABLE
+            msg = f"⚠️ PROP FIRM ALERT [{account.name}]: {reason}"
+            if CELERY_AVAILABLE:
+                send_copy_notification.delay(slave_name=account.name, symbol="N/A", direction="N/A",
+                                             lot=0, latency_ms=0, status=msg)
+        except Exception:
+            pass
 
     # ─── Lot Calculator ───────────────────────────────────────────────────────
 

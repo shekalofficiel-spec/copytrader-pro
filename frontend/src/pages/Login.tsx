@@ -46,23 +46,26 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
-        <div className="flex justify-center mb-8">
-          <Logo size={40} showText={true} />
+    <div className="min-h-screen bg-[#0f0f0f] flex items-center justify-center px-4">
+      {/* Background glow */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-neon/5 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-sm relative z-10">
+        <div className="flex justify-center mb-10">
+          <Logo size={44} showText={true} />
         </div>
 
-        <div className="bg-gray-900 rounded-2xl p-8 border border-gray-800 shadow-2xl">
-          <h2 className="text-xl font-semibold text-white text-center mb-1">Welcome back</h2>
-          <p className="text-gray-400 text-sm text-center mb-6">Sign in to your account</p>
+        <div className="bg-[#171717] border border-[#2a2a2a] rounded-2xl p-7 shadow-2xl">
+          <h2 className="text-lg font-bold text-white mb-1">Welcome back</h2>
+          <p className="text-[#555] text-sm mb-6">Sign in to your account</p>
 
           {error && (
-            <div className="bg-red-900/30 border border-red-700 text-red-300 rounded-lg p-3 text-sm mb-4">
+            <div className="bg-loss/10 border border-loss/20 text-loss rounded-xl p-3 text-sm mb-4">
               {error}
             </div>
           )}
 
-          {/* Google Sign In */}
+          {/* Google */}
           <div className="flex justify-center mb-5">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
@@ -71,54 +74,51 @@ export default function Login() {
               shape="rectangular"
               size="large"
               text="signin_with"
-              width="320"
+              width="300"
             />
           </div>
 
-          {/* Divider */}
           <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-700" />
-            <span className="text-gray-500 text-xs">or continue with email</span>
-            <div className="flex-1 h-px bg-gray-700" />
+            <div className="flex-1 h-px bg-[#2a2a2a]" />
+            <span className="text-[#444] text-xs">or</span>
+            <div className="flex-1 h-px bg-[#2a2a2a]" />
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Email</label>
+              <label className="block text-xs text-[#8a8a8a] mb-1.5 font-medium">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-neon/50 focus:bg-[#222] transition-all placeholder:text-[#444]"
                 placeholder="you@example.com"
               />
             </div>
-
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Password</label>
+              <label className="block text-xs text-[#8a8a8a] mb-1.5 font-medium">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-neon/50 focus:bg-[#222] transition-all placeholder:text-[#444]"
                 placeholder="••••••••"
               />
             </div>
-
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors"
+              className="w-full bg-neon hover:bg-neon-hover disabled:opacity-50 text-[#0f0f0f] font-bold py-2.5 rounded-xl transition-colors text-sm"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-5">
+          <p className="text-center text-[#555] text-xs mt-5">
             No account?{' '}
-            <Link to="/register" className="text-blue-400 hover:text-blue-300">
+            <Link to="/register" className="text-neon hover:text-neon-hover font-medium">
               Create one free
             </Link>
           </p>

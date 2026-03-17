@@ -38,6 +38,8 @@ export const authApi = {
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
+  updateMe: (data: Record<string, unknown>) =>
+    api.patch('/auth/me', data).then(r => r.data),
   googleLogin: (credential: string) =>
     api.post('/auth/google', { credential }).then(r => r.data),
 }
@@ -82,6 +84,30 @@ export const settingsApi = {
   update: (data: Record<string, unknown>) => api.put('/settings', data).then(r => r.data),
   testTelegram: () => api.post('/settings/test-telegram').then(r => r.data),
   testEmail: () => api.post('/settings/test-email').then(r => r.data),
+}
+
+// ─── Engine ───────────────────────────────────────────────────────────────────
+export const engineApi = {
+  status: () => api.get<{ active: boolean }>('/engine/status').then(r => r.data),
+  toggle: () => api.post<{ active: boolean; message: string }>('/engine/toggle').then(r => r.data),
+}
+
+// ─── Journal ──────────────────────────────────────────────────────────────────
+export const journalApi = {
+  entries: (params: Record<string, unknown> = {}) =>
+    api.get('/journal/entries', { params }).then(r => r.data),
+  stats: (days = 30) =>
+    api.get('/journal/stats', { params: { days } }).then(r => r.data),
+  calendar: (year: number, month: number) =>
+    api.get('/journal/calendar', { params: { year, month } }).then(r => r.data),
+  create: (data: Record<string, unknown>) =>
+    api.post('/journal/entries', data).then(r => r.data),
+  update: (id: number, data: Record<string, unknown>) =>
+    api.patch(`/journal/entries/${id}`, data).then(r => r.data),
+  delete: (id: number) =>
+    api.delete(`/journal/entries/${id}`).then(r => r.data),
+  syncTrades: () =>
+    api.post('/journal/sync-trades').then(r => r.data),
 }
 
 export default api

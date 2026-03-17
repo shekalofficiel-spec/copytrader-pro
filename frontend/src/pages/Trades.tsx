@@ -8,9 +8,9 @@ import type { TradeStatus } from '../types'
 function StatusBadge({ status }: { status: TradeStatus }) {
   const styles: Record<TradeStatus, string> = {
     OPEN: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-    CLOSED: 'bg-gray-500/10 text-gray-400 border-gray-500/30',
+    CLOSED: 'bg-[#2a2a2a] text-[#8a8a8a] border-[#333]',
     PARTIALLY_CLOSED: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-    CANCELLED: 'bg-red-loss/10 text-red-loss border-red-loss/30',
+    CANCELLED: 'bg-[#f87171]/10 text-[#f87171] border-[#f87171]/30',
   }
   return (
     <span className={cn('text-xs px-2 py-0.5 rounded border', styles[status])}>
@@ -23,7 +23,7 @@ function DirectionBadge({ direction }: { direction: string }) {
   return (
     <span className={cn(
       'text-xs font-bold px-2 py-0.5 rounded',
-      direction === 'BUY' ? 'bg-green-profit/10 text-green-profit' : 'bg-red-loss/10 text-red-loss'
+      direction === 'BUY' ? 'bg-[#4ade80]/10 text-[#4ade80]' : 'bg-[#f87171]/10 text-[#f87171]'
     )}>
       {direction}
     </span>
@@ -68,52 +68,55 @@ export default function Trades() {
     URL.revokeObjectURL(url)
   }
 
+  const thCls = "px-4 py-2.5 text-[10px] font-semibold text-[#555] uppercase tracking-wider"
+  const tdCls = "px-4 py-2.5"
+
   return (
-    <div className="p-6 space-y-5">
+    <div className="min-h-full bg-[#0f0f0f] p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Trades</h1>
-          <p className="text-gray-500 text-sm mt-1">{activeTrades.length} open · {total} total</p>
+          <h1 className="text-2xl font-bold text-white">Trades</h1>
+          <p className="text-[#555] text-sm mt-0.5">{activeTrades.length} open · {total} total</p>
         </div>
-        <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-400 hover:text-white">
+        <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl text-sm text-[#8a8a8a] hover:text-white hover:border-[#333] transition-all">
           <Download className="w-4 h-4" /> Export CSV
         </button>
       </div>
 
       {/* Active Trades */}
       {activeTrades.length > 0 && (
-        <div className="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-dark-700 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-profit animate-pulse-slow" />
+        <div className="bg-[#1a1a1a] border border-[#242424] rounded-2xl overflow-hidden">
+          <div className="px-5 py-3.5 border-b border-[#222] flex items-center gap-2.5">
+            <span className="w-2 h-2 rounded-full bg-[#4ade80] animate-pulse" />
             <h2 className="text-sm font-semibold text-white">Open Positions ({activeTrades.length})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-dark-700 text-gray-500 text-xs uppercase">
-                  <th className="px-4 py-2 text-left">Symbol</th>
-                  <th className="px-4 py-2 text-left">Dir</th>
-                  <th className="px-4 py-2 text-right">Lot</th>
-                  <th className="px-4 py-2 text-right">Open</th>
-                  <th className="px-4 py-2 text-right">SL / TP</th>
-                  <th className="px-4 py-2 text-right">P&L</th>
-                  <th className="px-4 py-2 text-left">Opened</th>
+                <tr className="border-b border-[#222]">
+                  <th className={cn(thCls, 'text-left')}>Symbol</th>
+                  <th className={cn(thCls, 'text-left')}>Dir</th>
+                  <th className={cn(thCls, 'text-right')}>Lot</th>
+                  <th className={cn(thCls, 'text-right')}>Open</th>
+                  <th className={cn(thCls, 'text-right')}>SL / TP</th>
+                  <th className={cn(thCls, 'text-right')}>P&L</th>
+                  <th className={cn(thCls, 'text-left')}>Opened</th>
                 </tr>
               </thead>
               <tbody>
                 {activeTrades.map(t => (
-                  <tr key={t.id} className="border-b border-dark-700/50 hover:bg-dark-700/30">
-                    <td className="px-4 py-2.5 font-mono font-semibold text-white">{t.symbol}</td>
-                    <td className="px-4 py-2.5"><DirectionBadge direction={t.direction} /></td>
-                    <td className="px-4 py-2.5 text-right font-mono text-gray-300">{t.lot_size}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-gray-300">{t.open_price.toFixed(5)}</td>
-                    <td className="px-4 py-2.5 text-right font-mono text-gray-500 text-xs">
+                  <tr key={t.id} className="border-b border-[#1e1e1e] hover:bg-[#1f1f1f] transition-colors">
+                    <td className={cn(tdCls, 'font-mono font-semibold text-white')}>{t.symbol}</td>
+                    <td className={tdCls}><DirectionBadge direction={t.direction} /></td>
+                    <td className={cn(tdCls, 'text-right font-mono text-[#8a8a8a]')}>{t.lot_size}</td>
+                    <td className={cn(tdCls, 'text-right font-mono text-[#8a8a8a]')}>{t.open_price.toFixed(5)}</td>
+                    <td className={cn(tdCls, 'text-right font-mono text-[#555] text-xs')}>
                       {t.stop_loss?.toFixed(5) ?? '—'} / {t.take_profit?.toFixed(5) ?? '—'}
                     </td>
-                    <td className={cn('px-4 py-2.5 text-right font-mono font-semibold', getPnlColor(t.profit))}>
+                    <td className={cn(tdCls, 'text-right font-mono font-semibold', getPnlColor(t.profit))}>
                       {formatCurrency(t.profit)}
                     </td>
-                    <td className="px-4 py-2.5 text-gray-500 text-xs">{formatDateTime(t.open_time)}</td>
+                    <td className={cn(tdCls, 'text-[#555] text-xs')}>{formatDateTime(t.open_time)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -123,20 +126,20 @@ export default function Trades() {
       )}
 
       {/* History */}
-      <div className="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
-        <div className="px-4 py-3 border-b border-dark-700 flex items-center gap-3">
+      <div className="bg-[#1a1a1a] border border-[#242424] rounded-2xl overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-[#222] flex items-center gap-3">
           <h2 className="text-sm font-semibold text-white flex-1">Trade History</h2>
           <input
             type="text"
             placeholder="Symbol..."
             value={symbolFilter}
             onChange={e => { setSymbolFilter(e.target.value.toUpperCase()); setPage(1) }}
-            className="bg-dark-700 border border-dark-600 rounded-lg px-3 py-1.5 text-xs text-white w-28 focus:outline-none"
+            className="bg-[#141414] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-xs text-white w-28 focus:outline-none focus:border-[#c8f135]/40 placeholder:text-[#444] transition-all"
           />
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value); setPage(1) }}
-            className="bg-dark-700 border border-dark-600 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none"
+            className="bg-[#141414] border border-[#2a2a2a] rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-[#c8f135]/40 transition-all"
           >
             <option value="">All Status</option>
             <option value="OPEN">Open</option>
@@ -147,52 +150,56 @@ export default function Trades() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-dark-700 text-gray-500 text-xs uppercase">
-                <th className="px-4 py-2 text-left">Symbol</th>
-                <th className="px-4 py-2 text-left">Dir</th>
-                <th className="px-4 py-2 text-right">Lot</th>
-                <th className="px-4 py-2 text-right">Open</th>
-                <th className="px-4 py-2 text-right">Close</th>
-                <th className="px-4 py-2 text-right">P&L</th>
-                <th className="px-4 py-2 text-left">Status</th>
-                <th className="px-4 py-2 text-right">Latency</th>
-                <th className="px-4 py-2 text-left">Opened</th>
+              <tr className="border-b border-[#222]">
+                <th className={cn(thCls, 'text-left')}>Symbol</th>
+                <th className={cn(thCls, 'text-left')}>Dir</th>
+                <th className={cn(thCls, 'text-right')}>Lot</th>
+                <th className={cn(thCls, 'text-right')}>Open</th>
+                <th className={cn(thCls, 'text-right')}>Close</th>
+                <th className={cn(thCls, 'text-right')}>P&L</th>
+                <th className={cn(thCls, 'text-left')}>Status</th>
+                <th className={cn(thCls, 'text-right')}>Latency</th>
+                <th className={cn(thCls, 'text-left')}>Opened</th>
               </tr>
             </thead>
             <tbody>
               {trades.map(t => (
-                <tr key={t.id} className="border-b border-dark-700/50 hover:bg-dark-700/30">
-                  <td className="px-4 py-2.5 font-mono font-semibold text-white">{t.symbol}</td>
-                  <td className="px-4 py-2.5"><DirectionBadge direction={t.direction} /></td>
-                  <td className="px-4 py-2.5 text-right font-mono text-gray-300">{t.lot_size}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-gray-300 text-xs">{t.open_price.toFixed(5)}</td>
-                  <td className="px-4 py-2.5 text-right font-mono text-gray-400 text-xs">{t.close_price?.toFixed(5) ?? '—'}</td>
-                  <td className={cn('px-4 py-2.5 text-right font-mono font-semibold', getPnlColor(t.profit))}>
+                <tr key={t.id} className="border-b border-[#1e1e1e] hover:bg-[#1f1f1f] transition-colors">
+                  <td className={cn(tdCls, 'font-mono font-semibold text-white')}>{t.symbol}</td>
+                  <td className={tdCls}><DirectionBadge direction={t.direction} /></td>
+                  <td className={cn(tdCls, 'text-right font-mono text-[#8a8a8a]')}>{t.lot_size}</td>
+                  <td className={cn(tdCls, 'text-right font-mono text-[#8a8a8a] text-xs')}>{t.open_price.toFixed(5)}</td>
+                  <td className={cn(tdCls, 'text-right font-mono text-[#555] text-xs')}>{t.close_price?.toFixed(5) ?? '—'}</td>
+                  <td className={cn(tdCls, 'text-right font-mono font-semibold', getPnlColor(t.profit))}>
                     {formatCurrency(t.profit)}
                   </td>
-                  <td className="px-4 py-2.5"><StatusBadge status={t.status} /></td>
-                  <td className="px-4 py-2.5 text-right font-mono text-xs text-gray-500">
+                  <td className={tdCls}><StatusBadge status={t.status} /></td>
+                  <td className={cn(tdCls, 'text-right font-mono text-xs text-[#555]')}>
                     {t.copy_latency_ms != null ? `${t.copy_latency_ms}ms` : '—'}
                   </td>
-                  <td className="px-4 py-2.5 text-gray-500 text-xs">{formatDateTime(t.open_time)}</td>
+                  <td className={cn(tdCls, 'text-[#555] text-xs')}>{formatDateTime(t.open_time)}</td>
                 </tr>
               ))}
+              {trades.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="px-5 py-10 text-center text-[#333] text-sm">No trades found</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="px-4 py-3 border-t border-dark-700 flex items-center justify-between text-sm text-gray-400">
+          <div className="px-5 py-3 border-t border-[#222] flex items-center justify-between text-sm text-[#555]">
             <span>{total} trades total</span>
             <div className="flex items-center gap-2">
               <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                className="p-1 rounded hover:bg-dark-700 disabled:opacity-30">
+                className="p-1 rounded-lg hover:bg-[#242424] disabled:opacity-30 transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-white">{page} / {totalPages}</span>
+              <span className="text-white font-medium px-2">{page} / {totalPages}</span>
               <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                className="p-1 rounded hover:bg-dark-700 disabled:opacity-30">
+                className="p-1 rounded-lg hover:bg-[#242424] disabled:opacity-30 transition-colors">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

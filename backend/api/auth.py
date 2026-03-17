@@ -56,6 +56,21 @@ async def me(current_user: User = Depends(get_current_user)):
     return UserOut.model_validate(current_user)
 
 
+@router.patch("/me", response_model=UserOut)
+async def update_me(
+    payload: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    allowed = {"full_name", "onboarding_completed"}
+    for field, value in payload.items():
+        if field in allowed:
+            setattr(current_user, field, value)
+    await db.commit()
+    await db.refresh(current_user)
+    return UserOut.model_validate(current_user)
+
+
 @router.post("/google", response_model=Token)
 async def google_auth(
     payload: dict,

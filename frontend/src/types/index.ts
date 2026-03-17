@@ -21,6 +21,10 @@ export interface Account {
   min_margin_level: number
   max_lot_size: number
   prop_firm_mode: boolean
+  prop_firm_rules?: string
+  profit_target_pct?: number
+  daily_drawdown_pct?: number
+  total_drawdown_pct?: number
   no_trade_weekend: boolean
   no_trade_news: boolean
   allowed_instruments: string[]
@@ -119,6 +123,7 @@ export interface AuthUser {
   subscription_tier: SubscriptionTier
   is_active: boolean
   created_at: string
+  onboarding_completed: boolean
 }
 
 export interface SubscriptionInfo {

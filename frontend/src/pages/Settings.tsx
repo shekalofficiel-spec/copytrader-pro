@@ -5,8 +5,8 @@ import { cn } from '../lib/utils'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-dark-700">
+    <div className="bg-[#1a1a1a] border border-[#242424] rounded-2xl overflow-hidden">
+      <div className="px-5 py-4 border-b border-[#222]">
         <h2 className="text-sm font-semibold text-white">{title}</h2>
       </div>
       <div className="p-5 space-y-4">{children}</div>
@@ -17,9 +17,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, help, children }: { label: string; help?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-sm text-gray-300 mb-1">{label}</label>
+      <label className="block text-xs text-[#8a8a8a] mb-1.5 font-medium">{label}</label>
       {children}
-      {help && <p className="text-xs text-gray-600 mt-1">{help}</p>}
+      {help && <p className="text-xs text-[#444] mt-1.5">{help}</p>}
     </div>
   )
 }
@@ -66,13 +66,15 @@ export default function Settings() {
 
   const handleTestTelegram = async () => {
     const r = await testTelegramMut.mutateAsync()
-    setTestResults(prev => ({ ...prev, telegram: r.success ? '✅ Sent!' : `❌ ${r.error}` }))
+    setTestResults(prev => ({ ...prev, telegram: r.success ? 'Sent!' : `Failed: ${r.error}` }))
   }
 
   const handleTestEmail = async () => {
     const r = await testEmailMut.mutateAsync()
-    setTestResults(prev => ({ ...prev, email: r.success ? '✅ Sent!' : `❌ ${r.error}` }))
+    setTestResults(prev => ({ ...prev, email: r.success ? 'Sent!' : `Failed: ${r.error}` }))
   }
+
+  const inputCls = "w-full bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#c8f135]/50 placeholder:text-[#444] transition-all"
 
   const input = (key: keyof typeof form, type = 'text', placeholder = '') => (
     <input
@@ -80,40 +82,42 @@ export default function Settings() {
       placeholder={placeholder}
       value={String(form[key])}
       onChange={e => setForm(f => ({ ...f, [key]: type === 'number' ? parseInt(e.target.value) || 0 : e.target.value }))}
-      className="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-gold/50"
+      className={inputCls}
     />
   )
 
   return (
-    <div className="p-6 space-y-5">
+    <div className="min-h-full bg-[#0f0f0f] p-6 space-y-5">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Settings</h1>
-          <p className="text-gray-500 text-sm mt-1">Configure notifications and engine parameters</p>
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
+          <p className="text-[#555] text-sm mt-0.5">Configure notifications and engine parameters</p>
         </div>
         <button
           onClick={handleSave}
           className={cn(
-            'px-5 py-2 rounded-lg text-sm font-bold transition-colors',
-            saved ? 'bg-green-profit/20 text-green-profit border border-green-profit/30' : 'bg-gold text-dark-950 hover:bg-gold-light'
+            'px-5 py-2.5 rounded-xl text-sm font-bold transition-all',
+            saved
+              ? 'bg-[#4ade80]/10 text-[#4ade80] border border-[#4ade80]/30'
+              : 'bg-[#c8f135] text-[#0f0f0f] hover:bg-[#a8cc2a]'
           )}
         >
-          {saved ? '✅ Saved!' : 'Save Settings'}
+          {saved ? 'Saved!' : 'Save Settings'}
         </button>
       </div>
 
-      {/* Current status */}
+      {/* Status indicators */}
       {settings && (
         <div className="flex gap-3 text-xs">
-          <span className={cn('px-3 py-1.5 rounded-lg border', settings.telegram_configured
-            ? 'bg-green-profit/10 text-green-profit border-green-profit/30'
-            : 'bg-gray-500/10 text-gray-500 border-gray-500/30')}>
-            Telegram {settings.telegram_configured ? '✅' : '⬜'}
+          <span className={cn('px-3 py-1.5 rounded-xl border font-medium', settings.telegram_configured
+            ? 'bg-[#4ade80]/10 text-[#4ade80] border-[#4ade80]/30'
+            : 'bg-[#2a2a2a] text-[#555] border-[#333]')}>
+            Telegram {settings.telegram_configured ? '✓ Configured' : 'Not configured'}
           </span>
-          <span className={cn('px-3 py-1.5 rounded-lg border', settings.smtp_configured
-            ? 'bg-green-profit/10 text-green-profit border-green-profit/30'
-            : 'bg-gray-500/10 text-gray-500 border-gray-500/30')}>
-            Email {settings.smtp_configured ? '✅' : '⬜'}
+          <span className={cn('px-3 py-1.5 rounded-xl border font-medium', settings.smtp_configured
+            ? 'bg-[#4ade80]/10 text-[#4ade80] border-[#4ade80]/30'
+            : 'bg-[#2a2a2a] text-[#555] border-[#333]')}>
+            Email {settings.smtp_configured ? '✓ Configured' : 'Not configured'}
           </span>
         </div>
       )}
@@ -127,10 +131,14 @@ export default function Settings() {
         </Field>
         <div className="flex items-center gap-3">
           <button onClick={handleTestTelegram} disabled={testTelegramMut.isPending}
-            className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white hover:bg-dark-600">
-            {testTelegramMut.isPending ? '⏳ Sending...' : 'Send Test Message'}
+            className="px-4 py-2 bg-[#242424] border border-[#2a2a2a] rounded-xl text-sm text-white hover:bg-[#2a2a2a] transition-colors">
+            {testTelegramMut.isPending ? 'Sending...' : 'Send Test Message'}
           </button>
-          {testResults.telegram && <span className="text-sm">{testResults.telegram}</span>}
+          {testResults.telegram && (
+            <span className={cn('text-sm font-medium', testResults.telegram.startsWith('Sent') ? 'text-[#4ade80]' : 'text-[#f87171]')}>
+              {testResults.telegram}
+            </span>
+          )}
         </div>
       </Section>
 
@@ -148,10 +156,14 @@ export default function Settings() {
         </Field>
         <div className="flex items-center gap-3">
           <button onClick={handleTestEmail} disabled={testEmailMut.isPending}
-            className="px-4 py-2 bg-dark-700 border border-dark-600 rounded-lg text-sm text-white hover:bg-dark-600">
-            {testEmailMut.isPending ? '⏳ Sending...' : 'Send Test Email'}
+            className="px-4 py-2 bg-[#242424] border border-[#2a2a2a] rounded-xl text-sm text-white hover:bg-[#2a2a2a] transition-colors">
+            {testEmailMut.isPending ? 'Sending...' : 'Send Test Email'}
           </button>
-          {testResults.email && <span className="text-sm">{testResults.email}</span>}
+          {testResults.email && (
+            <span className={cn('text-sm font-medium', testResults.email.startsWith('Sent') ? 'text-[#4ade80]' : 'text-[#f87171]')}>
+              {testResults.email}
+            </span>
+          )}
         </div>
       </Section>
 
@@ -170,10 +182,10 @@ export default function Settings() {
       </Section>
 
       <Section title="About">
-        <div className="text-sm text-gray-400 space-y-1">
-          <p><span className="text-white">CopyTrader Pro</span> v1.0.0</p>
+        <div className="text-sm text-[#555] space-y-1.5">
+          <p><span className="text-white font-medium">CopyTrader Pro</span> v1.0.0</p>
           <p>Supports MT4, MT5, cTrader, Binance (Spot & Futures)</p>
-          <p>Backend: FastAPI + PostgreSQL + Redis</p>
+          <p>Backend: FastAPI + PostgreSQL</p>
           <p>Real-time copy latency tracking & Telegram/email alerts</p>
         </div>
       </Section>

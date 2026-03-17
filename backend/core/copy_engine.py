@@ -93,6 +93,7 @@ class CopyEngine:
         """Poll master positions every COPY_POLL_INTERVAL_MS milliseconds.
         Creates a fresh DB session each cycle to avoid stale session errors."""
         from database import AsyncSessionLocal
+        from datetime import timezone as tz
         interval = settings.COPY_POLL_INTERVAL_MS / 1000.0
 
         while self._running:
@@ -105,6 +106,30 @@ class CopyEngine:
                             if master.id in self._connectors:
                                 await self._poll_master(master, db)
                         await db.commit()
+
+                # Friday 21:00 UTC — close positions for "no weekend" accounts
+                now = datetime.now(tz.utc)
+                if now.weekday() == 4 and now.hour == 21 and now.minute == 0:
+                    slaves_no_weekend = [
+                        a for a in self._accounts
+                        if a.role == AccountRole.SLAVE and a.is_active and a.no_trade_weekend
+                    ]
+                    for slave in slaves_no_weekend:
+                        if slave.id in self._connectors:
+                            try:
+                                connector = self._connectors[slave.id]
+                                await connector.close_all_positions()
+                                log.info("weekend_close_triggered", account_id=slave.id)
+                                await ws_manager.broadcast(LiveEvent(
+                                    event_type="RISK_ALERT",
+                                    account_id=slave.id,
+                                    account_name=slave.name,
+                                    message=f"Friday 21:00 UTC — all positions closed on {slave.name} (prop firm mode)",
+                                    timestamp=datetime.now(tz.utc),
+                                    severity="warning",
+                                ))
+                            except Exception as e:
+                                log.error("weekend_close_error", account_id=slave.id, error=str(e))
             except Exception as e:
                 log.error("polling_loop_error", error=str(e))
 

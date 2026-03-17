@@ -24,6 +24,7 @@ class UserOut(BaseModel):
     created_at: datetime
     avatar_url: Optional[str] = None
     google_id: Optional[str] = None
+    onboarding_completed: bool = False
 
     model_config = {"from_attributes": True}
 

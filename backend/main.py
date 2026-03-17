@@ -14,6 +14,7 @@ from api.auth import router as auth_router
 from api.billing import router as billing_router
 from api.demo import router as demo_router
 from api.mt5_bridge import router as mt5_bridge_router
+from api.journal import router as journal_router
 from core.copy_engine import copy_engine
 from websocket.manager import ws_manager
 
@@ -70,6 +71,7 @@ app.include_router(trades_router)
 app.include_router(dashboard_router)
 app.include_router(settings_router)
 app.include_router(mt5_bridge_router)
+app.include_router(journal_router)
 
 
 @app.get("/health")

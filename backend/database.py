@@ -44,6 +44,7 @@ async def init_db():
     import models.user      # noqa: F401
     import models.account   # noqa: F401
     import models.trade     # noqa: F401
+    import models.journal   # noqa: F401
     import api.mt5_bridge   # noqa: F401  — registers PendingOrder table
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -53,6 +54,11 @@ async def init_db():
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id VARCHAR(100) UNIQUE",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(500)",
                 "ALTER TABLE users ALTER COLUMN hashed_password DROP NOT NULL",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed BOOLEAN DEFAULT FALSE",
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS prop_firm_rules VARCHAR(50)",
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS profit_target_pct FLOAT",
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS daily_drawdown_pct FLOAT",
+                "ALTER TABLE accounts ADD COLUMN IF NOT EXISTS total_drawdown_pct FLOAT",
             ]
             for sql in migrations:
                 try:

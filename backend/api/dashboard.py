@@ -70,9 +70,12 @@ async def get_stats(
     losing = total_trades - winning
     win_rate = (winning / total_trades * 100) if total_trades > 0 else 0.0
 
-    # Trades copied today
+    # Trades copied today (scoped to user's slave accounts)
     copied_today_r = await db.execute(
-        select(func.count(CopyEvent.id)).where(CopyEvent.timestamp >= today_start)
+        select(func.count(CopyEvent.id)).where(
+            CopyEvent.timestamp >= today_start,
+            CopyEvent.slave_account_id.in_(user_account_ids),
+        )
     )
     copies_today = copied_today_r.scalar_one() or 0
 
@@ -94,15 +97,22 @@ async def get_stats(
     )
     masters = master_r.scalar_one() or 0
 
-    # Copy success rate + avg latency (only meaningful when trades exist)
+    # Copy success rate + avg latency (scoped to user's accounts)
     if total_trades == 0:
         copy_success_rate = 0.0
         avg_latency = 0.0
     else:
-        total_copies_r = await db.execute(select(func.count(CopyEvent.id)))
+        total_copies_r = await db.execute(
+            select(func.count(CopyEvent.id)).where(
+                CopyEvent.slave_account_id.in_(user_account_ids)
+            )
+        )
         total_copies = total_copies_r.scalar_one() or 0
         success_copies_r = await db.execute(
-            select(func.count(CopyEvent.id)).where(CopyEvent.status == CopyStatus.SUCCESS)
+            select(func.count(CopyEvent.id)).where(
+                CopyEvent.status == CopyStatus.SUCCESS,
+                CopyEvent.slave_account_id.in_(user_account_ids),
+            )
         )
         success_copies = success_copies_r.scalar_one() or 0
         copy_success_rate = (success_copies / total_copies * 100) if total_copies > 0 else 0.0
@@ -111,6 +121,7 @@ async def get_stats(
             select(func.avg(CopyEvent.latency_ms)).where(
                 CopyEvent.status == CopyStatus.SUCCESS,
                 CopyEvent.latency_ms.isnot(None),
+                CopyEvent.slave_account_id.in_(user_account_ids),
             )
         )
         avg_latency = avg_lat_r.scalar_one() or 0.0
@@ -176,6 +187,24 @@ async def get_performance(
         ))
 
     return points
+
+
+@router.get("/api/engine/status")
+async def engine_status(current_user: User = Depends(get_current_user)):
+    return {"active": copy_engine._running}
+
+
+@router.post("/api/engine/toggle")
+async def engine_toggle(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if copy_engine._running:
+        await copy_engine.stop()
+        return {"active": False, "message": "Copy engine stopped"}
+    else:
+        await copy_engine.start(db)
+        return {"active": True, "message": "Copy engine started"}
 
 
 @router.websocket("/ws/live")

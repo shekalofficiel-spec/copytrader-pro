@@ -52,6 +52,10 @@ class Account(Base):
 
     # Prop firm mode
     prop_firm_mode: Mapped[bool] = mapped_column(Boolean, default=False)
+    prop_firm_rules: Mapped[str] = mapped_column(String(50), nullable=True)  # FTMO, MFF, THE5ERS, E8, CUSTOM
+    profit_target_pct: Mapped[float] = mapped_column(Float, nullable=True)   # e.g. 10.0
+    daily_drawdown_pct: Mapped[float] = mapped_column(Float, nullable=True)  # e.g. 5.0
+    total_drawdown_pct: Mapped[float] = mapped_column(Float, nullable=True)  # e.g. 10.0
     no_trade_weekend: Mapped[bool] = mapped_column(Boolean, default=False)
     no_trade_news: Mapped[bool] = mapped_column(Boolean, default=False)
 

@@ -45,6 +45,10 @@ class AccountCreate(BaseModel):
     min_margin_level: float = Field(200.0, ge=0.0)
     max_lot_size: float = Field(10.0, ge=0.01)
     prop_firm_mode: bool = False
+    prop_firm_rules: Optional[str] = None
+    profit_target_pct: Optional[float] = None
+    daily_drawdown_pct: Optional[float] = None
+    total_drawdown_pct: Optional[float] = None
     no_trade_weekend: bool = False
     no_trade_news: bool = False
     allowed_instruments: list[str] = Field(default_factory=list)
@@ -61,6 +65,10 @@ class AccountUpdate(BaseModel):
     min_margin_level: Optional[float] = None
     max_lot_size: Optional[float] = None
     prop_firm_mode: Optional[bool] = None
+    prop_firm_rules: Optional[str] = None
+    profit_target_pct: Optional[float] = None
+    daily_drawdown_pct: Optional[float] = None
+    total_drawdown_pct: Optional[float] = None
     no_trade_weekend: Optional[bool] = None
     no_trade_news: Optional[bool] = None
     allowed_instruments: Optional[list[str]] = None
@@ -84,6 +92,10 @@ class AccountResponse(BaseModel):
     min_margin_level: float
     max_lot_size: float
     prop_firm_mode: bool
+    prop_firm_rules: Optional[str] = None
+    profit_target_pct: Optional[float] = None
+    daily_drawdown_pct: Optional[float] = None
+    total_drawdown_pct: Optional[float] = None
     no_trade_weekend: bool
     no_trade_news: bool
     allowed_instruments: list[str]
