@@ -25,35 +25,34 @@ export default function Logo({ size = 36, showText = true, className = '' }: Log
         <rect width="40" height="40" rx="10" fill="url(#logoGrad)" fillOpacity="0.12" />
         <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="#c8f135" strokeOpacity="0.4" />
 
-        {/* Chart bars - green gradient */}
-        <rect x="7" y="24" width="5" height="9" rx="1.5" fill="#c8f135" fillOpacity="0.5" />
-        <rect x="14" y="18" width="5" height="15" rx="1.5" fill="#c8f135" fillOpacity="0.75" />
-        <rect x="21" y="12" width="5" height="21" rx="1.5" fill="#c8f135" />
+        {/* Y letter */}
+        <text
+          x="20"
+          y="27"
+          textAnchor="middle"
+          fill="#c8f135"
+          fontSize="22"
+          fontWeight="800"
+          fontFamily="system-ui, -apple-system, sans-serif"
+          letterSpacing="-1"
+        >
+          Y
+        </text>
 
-        {/* Copy arrow - white */}
-        <path
-          d="M29 9 C33.5 9 37 12.5 37 17"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          fill="none"
-          strokeOpacity="0.9"
-        />
-        <path
-          d="M27 14.5 L30 18 L33.5 15"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          strokeOpacity="0.9"
-        />
+        {/* Connection dot top-left */}
+        <circle cx="9" cy="10" r="2.5" fill="#c8f135" fillOpacity="0.6" />
+        {/* Connection dot top-right */}
+        <circle cx="31" cy="10" r="2.5" fill="#c8f135" fillOpacity="0.6" />
+        {/* Line left to Y */}
+        <line x1="11" y1="10" x2="16" y2="17" stroke="#c8f135" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
+        {/* Line right to Y */}
+        <line x1="29" y1="10" x2="24" y2="17" stroke="#c8f135" strokeOpacity="0.4" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
 
       {showText && (
         <div className="leading-none select-none">
           <span className="font-bold text-white" style={{ fontSize: size * 0.475 }}>
-            Copy
+            Ye
           </span>
           <span
             className="font-bold"
@@ -62,13 +61,7 @@ export default function Logo({ size = 36, showText = true, className = '' }: Log
               color: '#c8f135',
             }}
           >
-            Trader
-          </span>
-          <span
-            className="font-semibold text-white opacity-60"
-            style={{ fontSize: size * 0.38 }}
-          >
-            {' '}Pro
+            Connect
           </span>
         </div>
       )}

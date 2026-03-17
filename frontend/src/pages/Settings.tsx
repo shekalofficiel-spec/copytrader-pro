@@ -473,7 +473,7 @@ export default function Settings() {
 
       <Section title="About">
         <div className="text-sm text-[#555] space-y-1.5">
-          <p><span className="text-white font-medium">CopyTrader Pro</span> v1.0.0</p>
+          <p><span className="text-white font-medium">YeConnect</span> v1.0.0</p>
           <p>Supports MT4, MT5, cTrader, Binance (Spot & Futures)</p>
           <p>Backend: FastAPI + PostgreSQL</p>
           <p>Real-time copy latency tracking & Telegram/email alerts</p>

@@ -50,7 +50,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
       <div className="w-16 h-16 rounded-2xl bg-[#c8f135]/10 border border-[#c8f135]/20 flex items-center justify-center mb-6">
         <Zap className="w-8 h-8 text-[#c8f135]" />
       </div>
-      <h2 className="text-2xl font-bold text-white mb-2">Bienvenue sur CopyTrader Pro 👋</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">Bienvenue sur YeConnect 👋</h2>
       <p className="text-[#555] mb-8">Configurons ton espace en 3 minutes</p>
 
       <div className="w-full space-y-3 mb-8 text-left">
