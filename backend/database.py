@@ -47,3 +47,15 @@ async def init_db():
     import api.mt5_bridge   # noqa: F401  — registers PendingOrder table
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Add new columns if they don't exist (safe migrations)
+        if not _is_sqlite:
+            migrations = [
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id VARCHAR(100) UNIQUE",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(500)",
+                "ALTER TABLE users ALTER COLUMN hashed_password DROP NOT NULL",
+            ]
+            for sql in migrations:
+                try:
+                    await conn.execute(__import__('sqlalchemy').text(sql))
+                except Exception:
+                    pass
