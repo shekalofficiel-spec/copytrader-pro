@@ -78,14 +78,6 @@ async def create_account(
                 detail=f"Slave limit reached ({current_user.max_slaves}) for your plan. Upgrade to add more.",
             )
 
-    # Try to validate credentials — non-blocking (IP restrictions, timeout, etc. shouldn't prevent saving)
-    from core.broker_validator import validate_broker, VERIFIABLE
-    try:
-        ok, _ = await validate_broker(str(payload.broker_type), payload.credentials)
-    except Exception:
-        ok = False
-    is_verified = ok and str(payload.broker_type) in VERIFIABLE
-
     encrypted = encrypt_credentials(payload.credentials)
     account = Account(
         user_id=current_user.id,
@@ -109,14 +101,11 @@ async def create_account(
         no_trade_weekend=payload.no_trade_weekend,
         no_trade_news=payload.no_trade_news,
         allowed_instruments=payload.allowed_instruments,
-        is_verified=is_verified,
+        is_verified=False,
     )
     db.add(account)
     await db.commit()
     await db.refresh(account)
-    # Connect account in background — don't block the HTTP response
-    import asyncio
-    asyncio.create_task(copy_engine.add_account(account))
     return account
 
 
