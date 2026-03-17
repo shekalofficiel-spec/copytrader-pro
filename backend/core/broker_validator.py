@@ -66,9 +66,9 @@ async def _validate_metaapi(credentials: dict) -> tuple[bool, str]:
 
 
 async def _validate_binance(credentials: dict) -> tuple[bool, str]:
-    """Verify Binance API key by calling account endpoint."""
+    """Verify Binance API key — tries Futures first, falls back to Spot."""
     import hashlib
-    import hmac
+    import hmac as _hmac
     import time
 
     api_key = credentials.get("api_key", "")
@@ -81,28 +81,59 @@ async def _validate_binance(credentials: dict) -> tuple[bool, str]:
     if len(api_key) < 20 or len(api_secret) < 20:
         return False, "Clés Binance invalides (longueur insuffisante)."
 
-    base = "https://testnet.binancefuture.com" if testnet else "https://fapi.binance.com"
+    def _sign(secret: str, query: str) -> str:
+        return _hmac.new(secret.encode(), query.encode(), hashlib.sha256).hexdigest()
+
     ts = int(time.time() * 1000)
     query = f"timestamp={ts}"
-    sig = hmac.new(api_secret.encode(), query.encode(), hashlib.sha256).hexdigest()
+    sig = _sign(api_secret, query)
 
     try:
         async with httpx.AsyncClient(timeout=10) as client:
+            # 1. Try Futures
+            if testnet:
+                futures_base = "https://testnet.binancefuture.com"
+            else:
+                futures_base = "https://fapi.binance.com"
+
             resp = await client.get(
-                f"{base}/fapi/v2/account",
+                f"{futures_base}/fapi/v2/account",
                 params={"timestamp": ts, "signature": sig},
                 headers={"X-MBX-APIKEY": api_key},
             )
-        if resp.status_code == 200:
-            return True, ""
-        data = resp.json()
-        code = data.get("code", resp.status_code)
-        msg = data.get("msg", "Erreur inconnue")
-        if code == -2014:
-            return False, "Clé API Binance invalide."
-        if code == -2015:
-            return False, "Clé API Binance invalide ou sans permission Futures."
-        return False, f"Binance error {code}: {msg}"
+            if resp.status_code == 200:
+                return True, ""
+
+            data = resp.json()
+            code = data.get("code", 0)
+
+            # -2015 = invalid key / no permissions → try Spot fallback
+            if code not in (-2015, -2014):
+                msg = data.get("msg", "Erreur inconnue")
+                return False, f"Binance Futures error {code}: {msg}"
+
+            # 2. Fallback: Spot API
+            spot_base = "https://testnet.binance.vision" if testnet else "https://api.binance.com"
+            ts2 = int(time.time() * 1000)
+            query2 = f"timestamp={ts2}"
+            sig2 = _sign(api_secret, query2)
+            resp2 = await client.get(
+                f"{spot_base}/api/v3/account",
+                params={"timestamp": ts2, "signature": sig2},
+                headers={"X-MBX-APIKEY": api_key},
+            )
+            if resp2.status_code == 200:
+                return True, ""
+
+            data2 = resp2.json()
+            code2 = data2.get("code", resp2.status_code)
+            msg2 = data2.get("msg", "Erreur inconnue")
+            if code2 == -2014:
+                return False, "Clé API Binance invalide."
+            if code2 == -2015:
+                return False, "Clé API Binance invalide ou restrictions IP actives (whitelist ton IP dans les paramètres Binance)."
+            return False, f"Binance error {code2}: {msg2}"
+
     except httpx.TimeoutException:
         return False, "Timeout lors de la connexion à Binance."
     except Exception as e:
