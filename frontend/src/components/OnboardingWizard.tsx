@@ -219,21 +219,23 @@ function StepMaster({ onNext }: { onNext: () => void }) {
       )}
 
       <div className="flex gap-3 pt-1">
-        <button
-          onClick={handleTest}
-          disabled={status === 'testing' || (!form.login && !form.api_key)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#242424] border border-[#2a2a2a] rounded-xl text-sm text-white hover:bg-[#2a2a2a] disabled:opacity-50 transition-all"
-        >
-          <Wifi className="w-4 h-4" />
-          {status === 'testing' ? 'Test en cours...' : 'Tester la connexion'}
-        </button>
-        <button
-          onClick={() => createdId && onNext()}
-          disabled={status !== 'success' || !createdId}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-        >
-          Continuer <ChevronRight className="w-4 h-4" />
-        </button>
+        {status === 'success' && createdId ? (
+          <button
+            onClick={onNext}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] transition-all"
+          >
+            Continuer <ChevronRight className="w-4 h-4" />
+          </button>
+        ) : (
+          <button
+            onClick={handleTest}
+            disabled={status === 'testing' || (!form.login && !form.api_key)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            <Wifi className="w-4 h-4" />
+            {status === 'testing' ? 'Vérification...' : 'Tester et continuer'}
+          </button>
+        )}
       </div>
     </div>
   )
