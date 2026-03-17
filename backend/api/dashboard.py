@@ -94,23 +94,26 @@ async def get_stats(
     )
     masters = master_r.scalar_one() or 0
 
-    # Copy success rate
-    total_copies_r = await db.execute(select(func.count(CopyEvent.id)))
-    total_copies = total_copies_r.scalar_one() or 0
-    success_copies_r = await db.execute(
-        select(func.count(CopyEvent.id)).where(CopyEvent.status == CopyStatus.SUCCESS)
-    )
-    success_copies = success_copies_r.scalar_one() or 0
-    copy_success_rate = (success_copies / total_copies * 100) if total_copies > 0 else 0.0
-
-    # Avg latency
-    avg_lat_r = await db.execute(
-        select(func.avg(CopyEvent.latency_ms)).where(
-            CopyEvent.status == CopyStatus.SUCCESS,
-            CopyEvent.latency_ms.isnot(None),
+    # Copy success rate + avg latency (only meaningful when trades exist)
+    if total_trades == 0:
+        copy_success_rate = 0.0
+        avg_latency = 0.0
+    else:
+        total_copies_r = await db.execute(select(func.count(CopyEvent.id)))
+        total_copies = total_copies_r.scalar_one() or 0
+        success_copies_r = await db.execute(
+            select(func.count(CopyEvent.id)).where(CopyEvent.status == CopyStatus.SUCCESS)
         )
-    )
-    avg_latency = avg_lat_r.scalar_one() or 0.0
+        success_copies = success_copies_r.scalar_one() or 0
+        copy_success_rate = (success_copies / total_copies * 100) if total_copies > 0 else 0.0
+
+        avg_lat_r = await db.execute(
+            select(func.avg(CopyEvent.latency_ms)).where(
+                CopyEvent.status == CopyStatus.SUCCESS,
+                CopyEvent.latency_ms.isnot(None),
+            )
+        )
+        avg_latency = avg_lat_r.scalar_one() or 0.0
 
     return StatsResponse(
         total_pnl=round(total_pnl, 2),

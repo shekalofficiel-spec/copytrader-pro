@@ -1,12 +1,14 @@
 """
 /api/settings — Global configuration management.
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import Optional
 
 from config import settings
 from services.notification_service import notification_service
+from api.auth import get_current_user
+from models.user import User
 
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
@@ -26,7 +28,7 @@ class SettingsPayload(BaseModel):
 
 
 @router.get("")
-async def get_settings():
+async def get_settings(_: User = Depends(get_current_user)):
     return {
         "telegram_bot_token": "***" if settings.TELEGRAM_BOT_TOKEN else None,
         "telegram_chat_id": settings.TELEGRAM_CHAT_ID,
@@ -43,7 +45,7 @@ async def get_settings():
 
 
 @router.put("")
-async def update_settings(payload: SettingsPayload):
+async def update_settings(payload: SettingsPayload, _: User = Depends(get_current_user)):
     """
     Update runtime settings.
     Note: For production, persist these to DB or .env file.
@@ -88,13 +90,13 @@ async def update_settings(payload: SettingsPayload):
 
 
 @router.post("/test-telegram")
-async def test_telegram():
+async def test_telegram(_: User = Depends(get_current_user)):
     success = await notification_service.test_telegram()
     return {"success": success}
 
 
 @router.post("/test-email")
-async def test_email():
+async def test_email(_: User = Depends(get_current_user)):
     try:
         await notification_service.send_email(
             to=settings.SMTP_USER or "",
