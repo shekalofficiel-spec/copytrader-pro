@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
@@ -16,6 +17,8 @@ const queryClient = new QueryClient({
     queries: { staleTime: 1000 * 10, retry: 1 },
   },
 })
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
 function AuthGate() {
   const { user, isLoading } = useAuth()
@@ -34,24 +37,26 @@ function AuthGate() {
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route element={<AuthGate />}>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/accounts" element={<Accounts />} />
-              <Route path="/trades" element={<Trades />} />
-              <Route path="/logs" element={<Logs />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/billing" element={<Billing />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route element={<AuthGate />}>
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/accounts" element={<Accounts />} />
+                <Route path="/trades" element={<Trades />} />
+                <Route path="/logs" element={<Logs />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/billing" element={<Billing />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   )
 }

@@ -1,10 +1,11 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, TrendingUp, ScrollText, Settings, Zap, Wifi, WifiOff, CreditCard, LogOut, Menu } from 'lucide-react'
+import { LayoutDashboard, Users, TrendingUp, ScrollText, Settings, Wifi, WifiOff, CreditCard, LogOut, Menu } from 'lucide-react'
 import { useWebSocket } from '../hooks/useWebSocket'
 import { useState } from 'react'
 import { tradesApi } from '../lib/api'
 import { cn } from '../lib/utils'
 import { useAuth } from '../contexts/AuthContext'
+import Logo from './Logo'
 
 const navItems = [
   { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -53,15 +54,7 @@ export default function Layout() {
     <>
       {/* Logo */}
       <div className="p-5 border-b border-dark-700">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gold/10 border border-gold/30 rounded flex items-center justify-center">
-            <Zap className="w-4 h-4 text-gold" />
-          </div>
-          <div>
-            <div className="font-bold text-white text-sm leading-tight">CopyTrader</div>
-            <div className="text-gold text-xs font-semibold">Pro</div>
-          </div>
-        </div>
+        <Logo size={32} showText={true} />
       </div>
 
       {/* Nav */}
@@ -154,10 +147,7 @@ export default function Layout() {
           <button onClick={() => setSidebarOpen(true)} className="text-gray-400 hover:text-white">
             <Menu className="w-5 h-5" />
           </button>
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-gold" />
-            <span className="font-bold text-white text-sm">CopyTrader <span className="text-gold">Pro</span></span>
-          </div>
+          <Logo size={28} showText={true} />
           <div className="flex items-center gap-1">
             {isConnected
               ? <Wifi className="w-4 h-4 text-green-profit" />

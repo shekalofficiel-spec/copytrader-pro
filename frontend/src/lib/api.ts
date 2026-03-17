@@ -38,6 +38,8 @@ export const authApi = {
   login: (data: { email: string; password: string }) =>
     api.post('/auth/login', data).then(r => r.data),
   me: () => api.get('/auth/me').then(r => r.data),
+  googleLogin: (credential: string) =>
+    api.post('/auth/google', { credential }).then(r => r.data),
 }
 
 // ─── Billing ──────────────────────────────────────────────────────────────────

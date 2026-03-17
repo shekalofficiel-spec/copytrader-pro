@@ -22,6 +22,8 @@ class UserOut(BaseModel):
     subscription_tier: SubscriptionTier
     is_active: bool
     created_at: datetime
+    avatar_url: Optional[str] = None
+    google_id: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

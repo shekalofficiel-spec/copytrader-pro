@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     # MetaApi (token central admin — tous les clients passent par ce token)
     METAAPI_TOKEN: Optional[str] = None
 
+    # Google OAuth
+    GOOGLE_CLIENT_ID: Optional[str] = None
+
     # Stripe
     STRIPE_SECRET_KEY: Optional[str] = None
     STRIPE_WEBHOOK_SECRET: Optional[str] = None

@@ -26,3 +26,4 @@ bcrypt==4.2.1
 stripe==14.4.1
 email-validator==2.3.0
 metaapi-cloud-sdk
+google-auth==2.29.0
