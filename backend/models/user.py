@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from sqlalchemy import String, Boolean, Integer, Enum, DateTime, Text
+from sqlalchemy import String, Boolean, Integer, Enum, DateTime, Text, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from database import Base
 
@@ -30,6 +30,15 @@ class User(Base):
     subscription_expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # 2FA / TOTP
+    totp_secret: Mapped[str] = mapped_column(String(64), nullable=True)
+    totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    backup_codes: Mapped[list] = mapped_column(JSON, nullable=True)  # list of hashed codes
+
+    # Login security
+    failed_login_attempts: Mapped[int] = mapped_column(Integer, default=0)
+    last_failed_login: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(

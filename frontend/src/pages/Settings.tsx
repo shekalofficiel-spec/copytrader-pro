@@ -1,7 +1,10 @@
-import { useState } from 'react'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { settingsApi } from '../lib/api'
+import { useState, useEffect } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { settingsApi, authApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
+import OtpInput from '../components/OtpInput'
 import { cn } from '../lib/utils'
+import type { UserSession } from '../types'
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -24,6 +27,269 @@ function Field({ label, help, children }: { label: string; help?: string; childr
   )
 }
 
+// ── 2FA Section ──────────────────────────────────────────────────────────────
+type TwoFaStep = 'idle' | 'setup' | 'disable'
+
+function TwoFaSection() {
+  const { user, updateUser } = useAuth()
+  const [step, setStep] = useState<TwoFaStep>('idle')
+  const [qrCode, setQrCode] = useState('')
+  const [secret, setSecret] = useState('')
+  const [backupCodes, setBackupCodes] = useState<string[]>([])
+  const [otp, setOtp] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [showBackup, setShowBackup] = useState(false)
+
+  const handleSetup = async () => {
+    setError('')
+    setLoading(true)
+    try {
+      const data = await authApi.setup2fa()
+      setQrCode(data.qr_code)
+      setSecret(data.secret)
+      setBackupCodes(data.backup_codes)
+      setStep('setup')
+    } catch {
+      setError('Impossible de démarrer la configuration.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleConfirmSetup = async () => {
+    if (otp.length < 6) return
+    setError('')
+    setLoading(true)
+    try {
+      await authApi.verifySetup2fa(otp)
+      updateUser({ totp_enabled: true })
+      setStep('idle')
+      setOtp('')
+      setShowBackup(true)
+    } catch {
+      setError('Code incorrect. Réessaie.')
+      setOtp('')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDisable = async () => {
+    if (otp.length < 6 || !password) return
+    setError('')
+    setLoading(true)
+    try {
+      await authApi.disable2fa(password, otp)
+      updateUser({ totp_enabled: false })
+      setStep('idle')
+      setOtp('')
+      setPassword('')
+    } catch {
+      setError('Mot de passe ou code incorrect.')
+      setOtp('')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const inputCls = "w-full bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-[#c8f135]/50 placeholder:text-[#444] transition-all"
+
+  // After enabling 2FA — show backup codes
+  if (showBackup && backupCodes.length > 0) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="px-2.5 py-1 bg-[#4ade80]/10 border border-[#4ade80]/30 text-[#4ade80] text-xs font-bold rounded-lg">✓ 2FA Activé</span>
+        </div>
+        <div className="bg-[#141414] border border-[#c8f135]/20 rounded-xl p-4">
+          <p className="text-[#c8f135] text-sm font-bold mb-1">Codes de secours</p>
+          <p className="text-[#555] text-xs mb-3">Sauvegarde ces codes dans un endroit sûr. Chaque code ne peut être utilisé qu'une seule fois.</p>
+          <div className="grid grid-cols-2 gap-2">
+            {backupCodes.map((code, i) => (
+              <span key={i} className="font-mono text-sm text-white bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-1.5 text-center tracking-widest">{code}</span>
+            ))}
+          </div>
+          <button onClick={() => setShowBackup(false)} className="mt-4 w-full py-2 bg-[#c8f135] text-[#0f0f0f] rounded-xl text-sm font-bold hover:bg-[#a8cc2a] transition-colors">
+            J'ai sauvegardé mes codes
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Setup flow
+  if (step === 'setup') {
+    return (
+      <div className="space-y-4">
+        <p className="text-[#8a8a8a] text-sm">Scanne ce QR code avec ton application authenticator (Google Authenticator, Authy…)</p>
+        {qrCode && (
+          <div className="flex justify-center">
+            <img src={`data:image/png;base64,${qrCode}`} alt="2FA QR Code" className="w-44 h-44 rounded-xl border border-[#2a2a2a]" />
+          </div>
+        )}
+        {secret && (
+          <div className="bg-[#141414] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-center">
+            <p className="text-[#555] text-xs mb-1">Code manuel</p>
+            <p className="font-mono text-sm text-white tracking-widest">{secret}</p>
+          </div>
+        )}
+        {error && <div className="bg-[#f87171]/10 border border-[#f87171]/20 text-[#f87171] rounded-xl p-3 text-sm">{error}</div>}
+        <div>
+          <p className="text-xs text-[#8a8a8a] mb-2">Entre le code à 6 chiffres de ton application pour confirmer</p>
+          <OtpInput value={otp} onChange={setOtp} disabled={loading} />
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => { setStep('idle'); setOtp('') }} className="flex-1 py-2.5 bg-[#242424] border border-[#2a2a2a] rounded-xl text-sm text-white hover:bg-[#2a2a2a] transition-colors">
+            Annuler
+          </button>
+          <button onClick={handleConfirmSetup} disabled={otp.length < 6 || loading}
+            className="flex-1 py-2.5 bg-[#c8f135] disabled:opacity-50 text-[#0f0f0f] rounded-xl text-sm font-bold hover:bg-[#a8cc2a] transition-colors">
+            {loading ? 'Vérification...' : 'Activer 2FA'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Disable flow
+  if (step === 'disable') {
+    return (
+      <div className="space-y-4">
+        <p className="text-[#8a8a8a] text-sm">Pour désactiver le 2FA, confirme ton mot de passe et entre le code TOTP actuel.</p>
+        {error && <div className="bg-[#f87171]/10 border border-[#f87171]/20 text-[#f87171] rounded-xl p-3 text-sm">{error}</div>}
+        <Field label="Mot de passe">
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+            className={inputCls} placeholder="••••••••" />
+        </Field>
+        <div>
+          <p className="text-xs text-[#8a8a8a] mb-2">Code TOTP</p>
+          <OtpInput value={otp} onChange={setOtp} disabled={loading} />
+        </div>
+        <div className="flex gap-3">
+          <button onClick={() => { setStep('idle'); setOtp(''); setPassword('') }}
+            className="flex-1 py-2.5 bg-[#242424] border border-[#2a2a2a] rounded-xl text-sm text-white hover:bg-[#2a2a2a] transition-colors">
+            Annuler
+          </button>
+          <button onClick={handleDisable} disabled={otp.length < 6 || !password || loading}
+            className="flex-1 py-2.5 bg-[#f87171]/80 disabled:opacity-50 text-white rounded-xl text-sm font-bold hover:bg-[#f87171] transition-colors">
+            {loading ? 'Désactivation...' : 'Désactiver 2FA'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Idle: show status + action button
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center text-lg border',
+          user?.totp_enabled ? 'bg-[#c8f135]/10 border-[#c8f135]/20' : 'bg-[#242424] border-[#2a2a2a]')}>
+          🔒
+        </div>
+        <div>
+          <p className="text-sm font-medium text-white">Authentification 2FA</p>
+          {user?.totp_enabled
+            ? <p className="text-xs text-[#4ade80]">Activée — ton compte est protégé</p>
+            : <p className="text-xs text-[#555]">Non activée — ajoute une couche de sécurité</p>}
+        </div>
+      </div>
+      {user?.totp_enabled ? (
+        <button onClick={() => setStep('disable')}
+          className="px-4 py-2 bg-[#f87171]/10 border border-[#f87171]/20 text-[#f87171] rounded-xl text-sm hover:bg-[#f87171]/20 transition-colors">
+          Désactiver
+        </button>
+      ) : (
+        <button onClick={handleSetup} disabled={loading}
+          className="px-4 py-2 bg-[#c8f135] text-[#0f0f0f] rounded-xl text-sm font-bold hover:bg-[#a8cc2a] disabled:opacity-50 transition-colors">
+          {loading ? '...' : 'Activer le 2FA'}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ── Sessions Section ─────────────────────────────────────────────────────────
+function SessionsSection() {
+  const qc = useQueryClient()
+  const { data: sessions = [] } = useQuery<UserSession[]>({
+    queryKey: ['sessions'],
+    queryFn: authApi.sessions,
+    refetchInterval: 30000,
+  })
+  const revokeMut = useMutation({
+    mutationFn: authApi.revokeSession,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions'] }),
+  })
+  const revokeAllMut = useMutation({
+    mutationFn: authApi.revokeAllSessions,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions'] }),
+  })
+
+  const fmtTime = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime()
+    const m = Math.floor(diff / 60000)
+    if (m < 1) return 'À l\'instant'
+    if (m < 60) return `Il y a ${m}min`
+    const h = Math.floor(m / 60)
+    if (h < 24) return `Il y a ${h}h`
+    return `Il y a ${Math.floor(h / 24)}j`
+  }
+
+  return (
+    <div className="space-y-3">
+      {sessions.length === 0 && (
+        <p className="text-[#555] text-sm">Aucune session active.</p>
+      )}
+      {sessions.map((s, i) => (
+        <div key={s.id} className="flex items-center justify-between p-3 bg-[#141414] border border-[#1e1e1e] rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl flex items-center justify-center text-base">
+              {s.device_type === 'mobile' ? '📱' : '💻'}
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm text-white font-medium truncate max-w-[200px]">
+                  {s.user_agent?.split('/')[0] || 'Navigateur inconnu'}
+                </p>
+                {i === 0 && (
+                  <span className="px-2 py-0.5 bg-[#c8f135]/10 border border-[#c8f135]/20 text-[#c8f135] text-xs rounded-md font-medium">
+                    Session actuelle
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#555]">
+                {s.ip_address} · {fmtTime(s.last_active)}
+              </p>
+            </div>
+          </div>
+          {i !== 0 && (
+            <button
+              onClick={() => revokeMut.mutate(s.id)}
+              disabled={revokeMut.isPending}
+              className="px-3 py-1.5 bg-[#f87171]/10 border border-[#f87171]/20 text-[#f87171] text-xs rounded-lg hover:bg-[#f87171]/20 transition-colors"
+            >
+              Révoquer
+            </button>
+          )}
+        </div>
+      ))}
+      {sessions.length > 1 && (
+        <button
+          onClick={() => revokeAllMut.mutate()}
+          disabled={revokeAllMut.isPending}
+          className="w-full py-2.5 bg-[#f87171]/10 border border-[#f87171]/20 text-[#f87171] text-sm rounded-xl hover:bg-[#f87171]/20 transition-colors"
+        >
+          {revokeAllMut.isPending ? 'Révocation...' : 'Révoquer toutes les autres sessions'}
+        </button>
+      )}
+    </div>
+  )
+}
+
+// ── Main Settings Page ────────────────────────────────────────────────────────
 export default function Settings() {
   const { data: settings } = useQuery({ queryKey: ['settings'], queryFn: settingsApi.get })
   const updateMut = useMutation({ mutationFn: settingsApi.update })
@@ -42,6 +308,21 @@ export default function Settings() {
     copy_retry_delay_ms: 500,
     daily_report_hour: 20,
   })
+
+  useEffect(() => {
+    if (settings) {
+      setForm(f => ({
+        ...f,
+        smtp_host: settings.smtp_host || f.smtp_host,
+        smtp_port: settings.smtp_port || f.smtp_port,
+        smtp_user: settings.smtp_user || f.smtp_user,
+        copy_poll_interval_ms: settings.copy_poll_interval_ms || f.copy_poll_interval_ms,
+        copy_retry_count: settings.copy_retry_count || f.copy_retry_count,
+        copy_retry_delay_ms: settings.copy_retry_delay_ms || f.copy_retry_delay_ms,
+        daily_report_hour: settings.daily_report_hour ?? f.daily_report_hour,
+      }))
+    }
+  }, [settings])
 
   const [saved, setSaved] = useState(false)
   const [testResults, setTestResults] = useState<Record<string, string>>({})
@@ -121,6 +402,15 @@ export default function Settings() {
           </span>
         </div>
       )}
+
+      {/* Security */}
+      <Section title="Sécurité">
+        <TwoFaSection />
+      </Section>
+
+      <Section title="Sessions actives">
+        <SessionsSection />
+      </Section>
 
       <Section title="Telegram Notifications">
         <Field label="Bot Token" help="Get from @BotFather on Telegram">

@@ -42,6 +42,10 @@ aiohttp==3.9.5
 slowapi==0.1.9
 limits==3.13.0
 
+# 2FA / TOTP
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
 # Utils
 python-dotenv==1.0.1
 structlog==24.1.0

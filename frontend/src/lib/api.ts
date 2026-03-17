@@ -42,6 +42,23 @@ export const authApi = {
     api.patch('/auth/me', data).then(r => r.data),
   googleLogin: (credential: string) =>
     api.post('/auth/google', { credential }).then(r => r.data),
+
+  // 2FA
+  setup2fa: () => api.post('/auth/2fa/setup').then(r => r.data),
+  verifySetup2fa: (code: string) => api.post('/auth/2fa/verify-setup', { code }).then(r => r.data),
+  disable2fa: (password: string, code: string) => api.post('/auth/2fa/disable', { password, code }).then(r => r.data),
+  verify2fa: (temp_token: string, code: string) => api.post('/auth/2fa/verify', { temp_token, code }).then(r => r.data),
+
+  // Device verification
+  verifyDevice: (temp_token: string, code: string, trust_device = true) =>
+    api.post('/auth/verify-device', { temp_token, code, trust_device }).then(r => r.data),
+  resendDeviceCode: (temp_token: string) =>
+    api.post('/auth/verify-device/resend', { temp_token }).then(r => r.data),
+
+  // Sessions
+  sessions: () => api.get('/auth/sessions').then(r => r.data),
+  revokeSession: (id: string) => api.delete(`/auth/sessions/${id}`).then(r => r.data),
+  revokeAllSessions: () => api.delete('/auth/sessions').then(r => r.data),
 }
 
 // ─── Billing ──────────────────────────────────────────────────────────────────

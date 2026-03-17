@@ -4,6 +4,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import { authApi } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 import Logo from '../components/Logo'
+import PasswordStrength from '../components/PasswordStrength'
 
 export default function Register() {
   const { login } = useAuth()
@@ -15,12 +16,12 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
-    if (form.password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères.')
+    if (form.password.length < 10) {
+      setError('Le mot de passe doit contenir au moins 10 caractères.')
       return
     }
-    if (!/[0-9!@#$%^&*()\-_=+]/.test(form.password)) {
-      setError('Le mot de passe doit contenir au moins un chiffre ou caractère spécial.')
+    if (!/[A-Z]/.test(form.password) || !/[a-z]/.test(form.password) || !/[0-9]/.test(form.password) || !/[!@#$%^&*()\-_=+[\]{}]/.test(form.password)) {
+      setError('Le mot de passe doit contenir majuscule, minuscule, chiffre et caractère spécial.')
       return
     }
     setLoading(true)
@@ -120,10 +121,11 @@ export default function Register() {
                 value={form.password}
                 onChange={e => set('password', e.target.value)}
                 required
-                minLength={8}
+                minLength={10}
                 className="w-full bg-[#1f1f1f] border border-[#2a2a2a] rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-neon/50 transition-all placeholder:text-[#444]"
-                placeholder="Min 8 characters"
+                placeholder="Min 10 characters"
               />
+              <PasswordStrength password={form.password} email={form.email} />
             </div>
 
             <div className="bg-neon/5 border border-neon/15 rounded-xl p-3 text-xs text-[#8a8a8a]">

@@ -125,6 +125,16 @@ export interface AuthUser {
   is_active: boolean
   created_at: string
   onboarding_completed: boolean
+  totp_enabled: boolean
+}
+
+export interface UserSession {
+  id: string
+  device_type: string
+  ip_address: string
+  user_agent: string
+  created_at: string
+  last_active: string
 }
 
 export interface SubscriptionInfo {

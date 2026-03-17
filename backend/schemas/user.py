@@ -25,6 +25,7 @@ class UserOut(BaseModel):
     avatar_url: Optional[str] = None
     google_id: Optional[str] = None
     onboarding_completed: bool = False
+    totp_enabled: bool = False
 
     model_config = {"from_attributes": True}
 
