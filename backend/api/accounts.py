@@ -112,10 +112,11 @@ async def create_account(
         is_verified=is_verified,
     )
     db.add(account)
-    await db.flush()
-    await copy_engine.add_account(account)
     await db.commit()
     await db.refresh(account)
+    # Connect account in background — don't block the HTTP response
+    import asyncio
+    asyncio.create_task(copy_engine.add_account(account))
     return account
 
 
