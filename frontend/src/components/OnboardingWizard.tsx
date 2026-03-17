@@ -85,7 +85,7 @@ function StepMaster({ onNext }: { onNext: () => void }) {
   const [form, setForm] = useState({ login: '', password: '', server: '', api_key: '', api_secret: '' })
   const [status, setStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  const [createdId, setCreatedId] = useState<number | null>(null)
+  const [, setCreatedId] = useState<number | null>(null)
 
   const set = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -97,43 +97,32 @@ function StepMaster({ onNext }: { onNext: () => void }) {
         ? { login: parseInt(form.login) || 0, password: form.password, server: form.server }
         : { api_key: form.api_key, api_secret: form.api_secret, futures: false, testnet: false }
 
-      // Create account (non-blocking, always saves)
-      let accountId = createdId
-      if (!accountId) {
-        const account = await accountsApi.create({
-          name: `Master ${broker}`,
-          broker_type: broker,
-          role: 'MASTER',
-          credentials,
-          lot_mode: 'RATIO',
-          lot_ratio: 1.0,
-          fixed_lot_size: 0.01,
-          risk_percent: 1.0,
-          max_drawdown_pct: 5.0,
-          max_trades: 10,
-          min_margin_level: 200,
-          max_lot_size: 10,
-          prop_firm_mode: false,
-          no_trade_weekend: false,
-          no_trade_news: false,
-          allowed_instruments: [],
-        })
-        accountId = account.id
-        setCreatedId(accountId)
-      }
-
-      // Test connection
-      const result = await accountsApi.testConnection(accountId)
-      if (result.success) {
-        setStatus('success')
-      } else {
-        setStatus('error')
-        setErrorMsg(result.error || 'Connexion échouée')
-      }
+      const account = await accountsApi.create({
+        name: `Master ${broker}`,
+        broker_type: broker,
+        role: 'MASTER',
+        credentials,
+        lot_mode: 'RATIO',
+        lot_ratio: 1.0,
+        fixed_lot_size: 0.01,
+        risk_percent: 1.0,
+        max_drawdown_pct: 5.0,
+        max_trades: 10,
+        min_margin_level: 200,
+        max_lot_size: 10,
+        prop_firm_mode: false,
+        no_trade_weekend: false,
+        no_trade_news: false,
+        allowed_instruments: [],
+      })
+      setCreatedId(account.id)
+      setStatus('success')
+      // Auto-advance after 600ms
+      setTimeout(onNext, 600)
     } catch (err: unknown) {
       setStatus('error')
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail
-      setErrorMsg(detail || 'Erreur réseau — vérifie ta connexion.')
+      setErrorMsg(detail || 'Erreur réseau. Vérifie que le backend est démarré.')
     }
   }
 
@@ -221,31 +210,20 @@ function StepMaster({ onNext }: { onNext: () => void }) {
       )}
 
       <div className="flex gap-3 pt-1 flex-wrap">
-        {status === 'success' ? (
-          <button
-            onClick={onNext}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] transition-all"
-          >
-            Continuer <ChevronRight className="w-4 h-4" />
-          </button>
-        ) : (
-          <button
-            onClick={handleTest}
-            disabled={status === 'testing' || (!form.login && !form.api_key)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            <Wifi className="w-4 h-4" />
-            {status === 'testing' ? 'Vérification...' : 'Tester et continuer'}
-          </button>
-        )}
-        {status === 'error' && createdId && (
-          <button
-            onClick={onNext}
-            className="flex items-center gap-1.5 text-sm text-[#555] hover:text-[#8a8a8a] transition-colors"
-          >
-            <SkipForward className="w-3.5 h-3.5" /> Continuer quand même
-          </button>
-        )}
+        <button
+          onClick={handleTest}
+          disabled={status === 'testing' || (!form.login && !form.api_key)}
+          className="flex items-center gap-2 px-5 py-2.5 bg-[#c8f135] text-[#0f0f0f] font-bold rounded-xl text-sm hover:bg-[#a8cc2a] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+        >
+          <Wifi className="w-4 h-4" />
+          {status === 'testing' ? 'Enregistrement...' : 'Enregistrer et continuer'}
+        </button>
+        <button
+          onClick={onNext}
+          className="flex items-center gap-1.5 text-sm text-[#555] hover:text-[#8a8a8a] transition-colors"
+        >
+          <SkipForward className="w-3.5 h-3.5" /> Passer cette étape
+        </button>
       </div>
     </div>
   )
