@@ -50,7 +50,7 @@ class User(Base):
     @property
     def max_slaves(self) -> int:
         return {
-            SubscriptionTier.FREE: 1,
+            SubscriptionTier.FREE: 5,
             SubscriptionTier.STARTER: 5,
             SubscriptionTier.PRO: 999,
         }.get(self.subscription_tier, 1)
