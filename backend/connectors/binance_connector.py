@@ -241,7 +241,7 @@ class BinanceConnector(BaseBrokerConnector):
 
     async def get_account_info(self) -> dict:
         if not BINANCE_AVAILABLE:
-            return {"balance": 10000.0, "equity": 10000.0, "margin": 0.0, "margin_level": 9999.0}
+            return {"balance": None, "equity": None, "margin": 0.0, "margin_level": 0.0}
 
         try:
             if self.futures:

@@ -177,10 +177,10 @@ class CTraderConnector(BaseBrokerConnector):
     async def get_account_info(self) -> dict:
         # In production: query ProtoOAGetCtidProfileByTokenReq or balance events
         return {
-            "balance": 10000.0,
-            "equity": 10000.0,
+            "balance": None,
+            "equity": None,
             "margin": 0.0,
-            "margin_level": 9999.0,
+            "margin_level": 0.0,
         }
 
     async def modify_position(

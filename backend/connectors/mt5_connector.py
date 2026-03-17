@@ -205,7 +205,7 @@ class MT5Connector(BaseBrokerConnector):
 
     async def get_account_info(self) -> dict:
         if not MT5_AVAILABLE:
-            return {"balance": 10000.0, "equity": 10000.0, "margin": 0.0, "margin_level": 9999.0}
+            return {"balance": None, "equity": None, "margin": 0.0, "margin_level": 0.0}
 
         def _info():
             info = mt5.account_info()
