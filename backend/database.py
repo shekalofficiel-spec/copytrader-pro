@@ -41,7 +41,9 @@ async def get_db() -> AsyncSession:
 
 async def init_db():
     # Import all models so SQLAlchemy registers them before create_all
-    import models.user  # noqa: F401
-    import models.account  # noqa: F401
+    import models.user      # noqa: F401
+    import models.account   # noqa: F401
+    import models.trade     # noqa: F401
+    import api.mt5_bridge   # noqa: F401  — registers PendingOrder table
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
